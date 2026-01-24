@@ -27,9 +27,22 @@ export function getSomeExercises(exIds: number[]) {
 
     const questionMarks = '?,'.repeat(exIds.length-1) + '?'
     return db.runSync(
-        `SELECT * FROM Exercises WHERE workout_id IN (${questionMarks})`, 
+        `SELECT * FROM Exercises WHERE exercise_id IN (${questionMarks})`, 
         exIds
     );
+}
+
+export function updateExercise(id: number, name: string, desc: string) {
+    const db = initDatabase();
+    db.runSync(
+        "UPDATE Exercises SET name = $name, description = $description WHERE exercise_id = $id", 
+        { $id: id, $name: name, $description: desc }
+    )
+}
+
+export function deleteExercise(id: number) {
+    const db = initDatabase();
+    db.runSync( "DELETE FROM Exercises WHERE exercise_id in ($id)", { $id: id })
 }
 
 export function getAllWourkouts() {

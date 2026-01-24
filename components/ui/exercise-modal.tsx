@@ -1,7 +1,7 @@
 import { getAllExercises } from '@/utils/database';
 import { type Exercise } from '@/utils/databaseTypes';
-import { router } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import { router, useFocusEffect } from 'expo-router';
+import React, { useCallback, useMemo, useState } from 'react';
 import { FlatList, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { ThemedButton, ThemedIcon, ThemedText, ThemedView } from "../themed";
@@ -19,14 +19,26 @@ export default function AddExerciseModal(
     const [exercises, setExercises] = useState<Exercise[]>([]);
 
     const selectedIncludes = (newEx: Exercise) => {
-        for (const ex of selected) if (ex.exercise_id === newEx.exercise_id) return true;
-        return false
+        return selected.find((ex) => ex.exercise_id === newEx.exercise_id)
     }
 
-    useEffect(() => {
+    const selectedIds = useMemo(() => new Set(selected.map((ex) => ex.exercise_id)), [selected]);
+
+    const syncSelected = (rows: Exercise[]) => {
+      for (const ex of selected) {
+        if (!rows.find((row) => row.exercise_id === ex.exercise_id)) {
+          removeExercise(ex.exercise_id);
+        }
+      }
+    };
+
+    useFocusEffect(
+      useCallback(() => {
         const rows = getAllExercises();
         setExercises(rows);
-    }, [modalVisible])
+        syncSelected(rows);
+      }, [selectedIds, selected, removeExercise])
+    );
 
     const handleSelectExercise = (exercise: Exercise) => {
         if (selectedIncludes(exercise)) {
@@ -66,8 +78,23 @@ export default function AddExerciseModal(
                                     selectedIncludes(item) && styles.exerciseSelected
                                 ]}
                                 onPress={() => handleSelectExercise(item)}>
-                                <ThemedText style={styles.exerciseName}>{item.name}</ThemedText>
-                                <ThemedText style={styles.exerciseDesc}>{item.description}</ThemedText>
+                                <View style={styles.cardText}>
+                                    <ThemedText style={styles.exerciseName}>{item.name}</ThemedText>
+                                    { item.description &&
+                                        <ThemedText style={styles.exerciseDesc}>{item.description}</ThemedText>}
+                                </View>
+                                <Pressable 
+                                    onPress={() => router.push({ 
+                                        pathname: '/createExercise',
+                                        params: {
+                                            exId: item.exercise_id,
+                                            exName: item.name,
+                                            exDesc: item.description
+                                        }
+                                    })}
+                                    style={styles.options}>
+                                    <ThemedIcon name='Pencil' />
+                                </Pressable>
                             </Pressable>
                         )}
                         ListEmptyComponent={
@@ -119,11 +146,25 @@ const styles = StyleSheet.create({
   },
 
   exerciseCard: {
+    flexDirection: 'row',
+    borderColor: 'transparent',
     paddingHorizontal: 16,
     paddingVertical: 14,
     borderRadius: 8,
     borderWidth: 1,
     marginBottom: 8,
+  },
+
+  cardText: {
+    flex: 1,
+    gap: 4,
+  },
+
+  options: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 8,
+    marginLeft: 8,
   },
 
   exerciseSelected: {

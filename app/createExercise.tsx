@@ -1,17 +1,35 @@
 import { ThemedButton, ThemedIcon, ThemedInput, ThemedText, ThemedView } from '@/components/themed';
-import { createExercise } from '@/utils/database';
-import { router } from 'expo-router';
+import { createExercise, deleteExercise, updateExercise } from '@/utils/database';
+import { router, useLocalSearchParams } from 'expo-router';
 import React, { useState } from 'react';
-import { Pressable, StyleSheet, TextInputChangeEvent, View } from 'react-native';
+import { Pressable, StyleSheet, Text, TextInputChangeEvent, View } from 'react-native';
 
 const App = () => {
-  const [name, setName] = useState('');
-  const [desc, setDesc] = useState('');
+  const { exId, exName, exDesc } = useLocalSearchParams();
+
+  const [name, setName] = useState(exName?.toString() || '');
+  const [desc, setDesc] = useState(exDesc?.toString() || '');
+  const [isEdit, _] = useState(!!exId);
 
   const handleChange = (
       e: TextInputChangeEvent, 
       setState: React.Dispatch<React.SetStateAction<string>>) => {
     setState(e.nativeEvent.text);
+  }
+
+  const handleSubmit = () => {
+    if (!isEdit) {
+      createExercise(name, desc)
+    } else {
+      if (!exId) return;
+      updateExercise(parseInt(Array.isArray(exId) ? exId[0] : exId), name, desc);
+    }
+    router.back()
+  }
+
+  const handleDelete = () => {
+    deleteExercise(parseInt(Array.isArray(exId) ? exId[0] : exId));
+    router.back()
   }
 
   return (
@@ -41,15 +59,15 @@ const App = () => {
             multiline 
           />
         </View>
+        <ThemedButton 
+          onPress={() => handleSubmit()} 
+        >
+          <Text>{isEdit ? "Update Exercise" : "Add Exercise"}</Text>
+        </ThemedButton>
+        <ThemedButton onPress={() => handleDelete()} style={styles.deleteButton}>
+          <ThemedText>Delete Execise</ThemedText>
+        </ThemedButton>
       </View>
-      <ThemedButton 
-        icon='Check'
-        onPress={() => {
-          createExercise(name, desc);
-          router.back();
-        }} 
-        style={styles.addButton}
-      />
     </ThemedView>
   );
 };
@@ -97,12 +115,8 @@ const styles = StyleSheet.create({
     textAlignVertical: 'top',
   },
 
-  addButton: {
-    position: 'absolute',
-    borderRadius: 50,
-    padding: 20,
-    bottom: 50,
-    right: 30,
+  deleteButton: {
+    backgroundColor: 'transparent',
   }
 })
 

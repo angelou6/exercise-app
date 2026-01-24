@@ -1,8 +1,9 @@
+import { CardColor } from '@/constants/theme';
 import { getAllExercises } from '@/utils/database';
 import { type Exercise } from '@/utils/databaseTypes';
 import { router, useFocusEffect } from 'expo-router';
-import React, { useCallback, useState } from 'react';
-import { FlatList, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import React, { useCallback, useMemo, useState } from 'react';
+import { FlatList, Modal, Pressable, StyleSheet, Text, useColorScheme, View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { ThemedButton, ThemedIcon, ThemedText, ThemedView } from "../themed";
 
@@ -17,6 +18,8 @@ type exerciseSelect = {
 export default function AddExerciseModal(
     {modalVisible, setModalVisible, addExecise, removeExercise, selected}: exerciseSelect) {
     const [exercises, setExercises] = useState<Exercise[]>([]);
+    const theme = useColorScheme() ?? 'light';
+    const cardTheme = useMemo(() => theme === "light" ? CardColor.light : CardColor.dark, [theme]);
 
     const selectedIncludes = (newEx: Exercise) => {
         return selected.find((ex) => ex.exercise_id === newEx.exercise_id)
@@ -70,13 +73,19 @@ export default function AddExerciseModal(
                             <Pressable 
                                 style={[
                                     styles.exerciseCard,
-                                    selectedIncludes(item) && styles.exerciseSelected
+                                    { 
+                                        backgroundColor: cardTheme.background, 
+                                        borderColor: selectedIncludes(item) ? cardTheme.selected : 'transparent'
+                                    }
                                 ]}
                                 onPress={() => handleSelectExercise(item)}>
                                 <View style={styles.cardText}>
-                                    <ThemedText style={styles.exerciseName}>{item.name}</ThemedText>
-                                    { item.description &&
-                                        <ThemedText style={styles.exerciseDesc}>{item.description}</ThemedText>}
+                                    <ThemedText type="subtitle">{item.name}</ThemedText>
+                                    {item.description && item.description.length > 0 && (
+                                        <Text style={[styles.exerciseDesc, { color: cardTheme.sub }]} numberOfLines={2}>
+                                            {item.description}
+                                        </Text>
+                                    )}
                                 </View>
                                 <Pressable 
                                     onPress={() => router.push({ 
@@ -87,14 +96,15 @@ export default function AddExerciseModal(
                                             exDesc: item.description
                                         }
                                     })}
-                                    style={styles.options}>
-                                    <ThemedIcon name='Pencil' />
+                                    style={styles.iconButton}>
+                                    <ThemedIcon name='Pencil' size={18} />
                                 </Pressable>
                             </Pressable>
                         )}
                         ListEmptyComponent={
                             <View style={styles.emptyState}>
-                                <ThemedText style={styles.emptyText}>No exercises yet</ThemedText>
+                                <ThemedIcon name="ListChecks" size={26} />
+                                <ThemedText type="subtitle">No exercises yet</ThemedText>
                             </View>
                         }
                     />
@@ -135,19 +145,18 @@ const styles = StyleSheet.create({
   },
 
   listContainer: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
     paddingBottom: 100,
-    gap: 12,
   },
 
   exerciseCard: {
     flexDirection: 'row',
-    borderColor: 'transparent',
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    borderRadius: 8,
+    alignItems: 'center',
     borderWidth: 1,
-    marginBottom: 8,
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    marginBottom: 12,
   },
 
   cardText: {
@@ -155,38 +164,19 @@ const styles = StyleSheet.create({
     gap: 4,
   },
 
-  options: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    gap: 8,
-    marginLeft: 8,
-  },
-
-  exerciseSelected: {
-    borderColor: '#ddd',
-  },
-
-  exerciseName: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 4,
+  iconButton: {
+    padding: 6,
+    borderRadius: 8,
   },
 
   exerciseDesc: {
     fontSize: 13,
-    opacity: 0.7,
   },
 
   emptyState: {
-    flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
     paddingVertical: 40,
-  },
-
-  emptyText: {
-    fontSize: 16,
-    opacity: 0.5,
+    gap: 8,
   },
 
   createButton: {

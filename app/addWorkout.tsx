@@ -1,5 +1,6 @@
 import { ThemedButton, ThemedEmojiPicker, ThemedIcon, ThemedInput, ThemedText, ThemedView } from '@/components/themed';
 import AddExerciseModal from '@/components/ui/exercise-modal';
+import { CardColor } from '@/constants/theme';
 import { type Exercise } from '@/utils/databaseTypes';
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
@@ -15,9 +16,7 @@ const App = () => {
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const theme = useColorScheme() ?? 'light';
 
-  const cardColor = useMemo(() => theme === 'light' ? '#f6f8fb' : '#111315', [theme]);
-  const cardBorder = useMemo(() => theme === 'light' ? '#e4e6eb' : '#1f2429', [theme]);
-  const textSubdued = useMemo(() => theme === 'light' ? '#555b66' : '#c2c7cf', [theme]);
+  const cardTheme = useMemo(() => theme === "light" ? CardColor.light : CardColor.dark, [])
 
   const handlePick = (emojiObject: EmojiType) => {
     setEmoji(emojiObject.emoji);
@@ -68,14 +67,17 @@ const App = () => {
               onDragEnd={(data) => setExercises(data.data)}
               contentContainerStyle={styles.listContent}
               renderItem={({ item, drag }: RenderItemParams<Exercise>) => (
-                <View style={[styles.card, { backgroundColor: cardColor, borderColor: cardBorder }]}>
+                <View style={[ styles.card, { 
+                    backgroundColor: cardTheme.background, 
+                    borderColor: cardTheme.border 
+                  }]}>
                   <Pressable onPressIn={drag} style={styles.dragHandle} hitSlop={12}>
                     <ThemedIcon name="GripVertical" />
                   </Pressable>
                   <View style={styles.cardTextBlock}>
                     <ThemedText type="subtitle">{item.name}</ThemedText>
                     {item.description?.length > 0 && (
-                      <Text style={[styles.smallText, { color: textSubdued }]} numberOfLines={2}>
+                      <Text style={[styles.smallText, { color: cardTheme.sub }]} numberOfLines={2}>
                         {item.description}
                       </Text>
                     )}

@@ -8,6 +8,21 @@ import { Platform } from 'react-native';
 const tintColorLight = '#0a7ea4';
 const tintColorDark = '#fff';
 
+export const CardColor = {
+  light: {
+    background: '#f6f8fb',
+    border: '#e4e6eb',
+    sub: '#555b66',
+    selected: '#555b66'
+  },
+  dark: {
+    background: '#111315',
+    border: '#1f2429',
+    sub: '#c2c7cf',
+    selected: '#f6f8fb'
+  }
+}
+
 export const ButtonColors = {
   light: 'lightblue',
   dark: 'white'

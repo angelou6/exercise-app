@@ -1,4 +1,4 @@
-import { Colors } from '@/constants/theme';
+import { ButtonColors } from '@/constants/theme';
 import * as Icons from 'lucide-react-native';
 import { Pressable, StyleSheet, useColorScheme, type PressableProps, type ViewStyle } from 'react-native';
 
@@ -15,7 +15,7 @@ export function ThemedButton({
   ...props 
 }: ThemedButtonProps) {
   const theme = useColorScheme() ?? 'light';
-  const buttonColor = theme === 'light' ? Colors.light.buttonColor : Colors.dark.buttonColor;
+  const buttonColor = theme === 'light' ? ButtonColors.light : ButtonColors.dark;
   
   return (
     <Pressable 

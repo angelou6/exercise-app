@@ -66,12 +66,9 @@ const App = () => {
               data={exercises}
               keyExtractor={(item) => item.exercise_id.toString()}
               onDragEnd={(data) => setExercises(data.data)}
-              activationDistance={12}
-              containerStyle={styles.listContainer}
               contentContainerStyle={styles.listContent}
-              ItemSeparatorComponent={() => <View style={styles.itemSpacer} />}
-              renderItem={({ item, drag, isActive }: RenderItemParams<Exercise>) => (
-                <View style={[styles.card, { backgroundColor: cardColor, borderColor: cardBorder }, isActive && styles.cardActive]}>
+              renderItem={({ item, drag }: RenderItemParams<Exercise>) => (
+                <View style={[styles.card, { backgroundColor: cardColor, borderColor: cardBorder }]}>
                   <Pressable onPressIn={drag} style={styles.dragHandle} hitSlop={12}>
                     <ThemedIcon name="GripVertical" />
                   </Pressable>
@@ -155,16 +152,8 @@ const styles = StyleSheet.create({
     paddingTop: 4,
   },
 
-  listContainer: {
-    flexGrow: 1,
-  },
-
   listContent: {
     paddingBottom: 16,
-  },
-
-  itemSpacer: {
-    height: 12,
   },
 
   card: {
@@ -174,11 +163,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     paddingHorizontal: 12,
     paddingVertical: 10,
-  },
-
-  cardActive: {
-    transform: [{ scale: 0.99 }],
-    opacity: 0.92,
+    marginBottom: 12,
   },
 
   dragHandle: {

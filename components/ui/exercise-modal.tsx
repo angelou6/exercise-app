@@ -1,7 +1,7 @@
 import { getAllExercises } from '@/utils/database';
 import { type Exercise } from '@/utils/databaseTypes';
 import { router, useFocusEffect } from 'expo-router';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { FlatList, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { ThemedButton, ThemedIcon, ThemedText, ThemedView } from "../themed";
@@ -22,22 +22,17 @@ export default function AddExerciseModal(
         return selected.find((ex) => ex.exercise_id === newEx.exercise_id)
     }
 
-    const selectedIds = useMemo(() => new Set(selected.map((ex) => ex.exercise_id)), [selected]);
-
-    const syncSelected = (rows: Exercise[]) => {
-      for (const ex of selected) {
-        if (!rows.find((row) => row.exercise_id === ex.exercise_id)) {
-          removeExercise(ex.exercise_id);
-        }
-      }
-    };
-
     useFocusEffect(
       useCallback(() => {
         const rows = getAllExercises();
         setExercises(rows);
-        syncSelected(rows);
-      }, [selectedIds, selected, removeExercise])
+        
+        for (const ex of selected) {
+          if (!rows.find((row) => row.exercise_id === ex.exercise_id)) {
+            removeExercise(ex.exercise_id);
+          }
+        }
+      }, [])
     );
 
     const handleSelectExercise = (exercise: Exercise) => {

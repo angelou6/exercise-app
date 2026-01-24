@@ -12,6 +12,7 @@ export const Colors = {
   light: {
     text: '#11181C',
     highlight: "#efefef",
+    buttonColor: 'lightblue',
     background: '#fff',
     tint: tintColorLight,
     icon: '#687076',
@@ -22,6 +23,7 @@ export const Colors = {
     text: '#ECEDEE',
     highlight: "#151718",
     background: '#000000',
+    buttonColor: 'white',
     tint: tintColorDark,
     icon: '#9BA1A6',
     tabIconDefault: '#9BA1A6',

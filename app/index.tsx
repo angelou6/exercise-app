@@ -1,31 +1,48 @@
-import { ThemedIcon, ThemedText, ThemedView } from '@/components/themed';
+import { ThemedButton, ThemedIcon, ThemedText, ThemedView } from '@/components/themed';
 import { router } from 'expo-router';
 import React from 'react';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 const App = () => {
   return (
-    <ThemedView>
-      <View style={style.header}>
+    <ThemedView style={styles.container}>
+      <View style={styles.header}>
         <ThemedText type='title'>Exercise App</ThemedText>
-        <TouchableOpacity onPress={() => {router.push('/settings')}}>
+        <Pressable onPress={() => router.push('/settings')}>
           <ThemedText>
             <ThemedIcon name='Settings' />
           </ThemedText>
-        </TouchableOpacity>
+        </Pressable>
       </View>
+      <ThemedButton 
+        onPress={() => router.push('/addWorkout')} 
+        style={styles.add_exercise}
+      >
+        <ThemedIcon name='Plus' />
+      </ThemedButton>
     </ThemedView>
   );
 };
 
+const styles = StyleSheet.create({
+  container: {
+    flex: 1
+  },
 
-const style = StyleSheet.create({
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingVertical: 15,
+  },
+
+  add_exercise: {
+    position: 'absolute',
+    borderRadius: 50,
+    padding: 20,
+    bottom: 50,
+    right: 30,
   }
 })
 

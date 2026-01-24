@@ -2,7 +2,7 @@ import { ThemedIcon, ThemedText, ThemedView } from '@/components/themed';
 import RadioSelect from '@/components/ui/radio-select';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 const App = () => {
   const [theme, setTheme] = useState(0);
@@ -10,9 +10,9 @@ const App = () => {
   return (
     <ThemedView>
       <View style={style.header}>
-        <TouchableOpacity onPress={() => router.back()}>
+        <Pressable onPress={() => router.back()}>
           <ThemedIcon name="ArrowLeft" />
-        </TouchableOpacity>
+        </Pressable>
         <ThemedText type='title'>Ajustes</ThemedText>
       </View>
       <View style={style.picker}>

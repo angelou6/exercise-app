@@ -1,11 +1,11 @@
 import { ButtonColors } from '@/constants/theme';
 import * as Icons from 'lucide-react-native';
-import { Pressable, StyleSheet, useColorScheme, type PressableProps, type ViewStyle } from 'react-native';
+import { Pressable, StyleSheet, useColorScheme, type PressableProps, type StyleProp, type ViewStyle } from 'react-native';
 
 type ThemedButtonProps = PressableProps & {
   children?: React.ReactNode;
   icon?: keyof typeof Icons;
-  style?: ViewStyle;
+  style?: StyleProp<ViewStyle>;
 };
 
 export function ThemedButton({ 

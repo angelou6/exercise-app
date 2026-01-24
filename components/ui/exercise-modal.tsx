@@ -1,10 +1,9 @@
-import { CardColor } from '@/constants/theme';
+import { CardColor, Colors } from '@/constants/theme';
 import { getAllExercises } from '@/utils/database';
 import { type Exercise } from '@/utils/databaseTypes';
 import { router, useFocusEffect } from 'expo-router';
 import React, { useCallback, useMemo, useState } from 'react';
 import { FlatList, Modal, Pressable, StyleSheet, Text, useColorScheme, View } from 'react-native';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { ThemedButton, ThemedIcon, ThemedText, ThemedView } from "../themed";
 
 type exerciseSelect = {
@@ -20,6 +19,7 @@ export default function AddExerciseModal(
     const [exercises, setExercises] = useState<Exercise[]>([]);
     const theme = useColorScheme() ?? 'light';
     const cardTheme = useMemo(() => theme === "light" ? CardColor.light : CardColor.dark, [theme]);
+    const tintColor = theme === 'light' ? Colors.light.tint : Colors.dark.tint;
 
     const selectedIncludes = (newEx: Exercise) => {
         return selected.find((ex) => ex.exercise_id === newEx.exercise_id)
@@ -30,8 +30,9 @@ export default function AddExerciseModal(
         const rows = getAllExercises();
         setExercises(rows);
         
+        const currentIds = new Set(rows.map(r => r.exercise_id));
         for (const ex of selected) {
-          if (!rows.find((row) => row.exercise_id === ex.exercise_id)) {
+          if (!currentIds.has(ex.exercise_id)) {
             removeExercise(ex.exercise_id);
           }
         }
@@ -44,84 +45,92 @@ export default function AddExerciseModal(
         } else {
             addExecise(exercise);
         }
-        setModalVisible(false);
     }
 
     return(
-        <SafeAreaProvider>
-        <SafeAreaView style={styles.centeredView}>
-            <Modal
+        <Modal
             animationType="slide"
-            transparent={false}
+            presentationStyle="pageSheet"
             visible={modalVisible}
             onRequestClose={() => {
                 setModalVisible(!modalVisible);
             }}>
-                <ThemedView style={styles.container}>
-                    <View style={styles.header}>
-                        <Pressable onPress={() => setModalVisible(false)}>
-                            <ThemedIcon name='X'/>
-                        </Pressable>
-                        <ThemedText type='title'>Select Exercise</ThemedText>
-                    </View>
-                    
-                    <FlatList
-                        data={exercises}
-                        keyExtractor={(item) => item.exercise_id.toString()}
-                        contentContainerStyle={styles.listContainer}
-                        renderItem={({item}) => (
+            <ThemedView style={styles.container}>
+                <View style={styles.header}>
+                    <ThemedText type='title'>Select Exercises</ThemedText>
+                    <Pressable onPress={() => router.push('/createExercise')} style={styles.closeButton}>
+                        <ThemedIcon name='Plus' />
+                    </Pressable>
+                </View>
+                <FlatList
+                    data={exercises}
+                    keyExtractor={(item) => item.exercise_id.toString()}
+                    contentContainerStyle={styles.listContainer}
+                    renderItem={({item}) => {
+                        const isSelected = !!selectedIncludes(item);
+                        return (
                             <Pressable 
                                 style={[
                                     styles.exerciseCard,
-                                    { 
-                                        backgroundColor: cardTheme.background, 
-                                        borderColor: selectedIncludes(item) ? cardTheme.selected : 'transparent'
-                                    }
+                                    {backgroundColor: cardTheme.background}
                                 ]}
                                 onPress={() => handleSelectExercise(item)}>
+                                <View style={styles.selectionIndicator}>
+                                    {isSelected ? (
+                                        <ThemedIcon name="CheckCircle2" color={tintColor} size={22} />
+                                    ) : (
+                                        <ThemedIcon name="Circle" color={cardTheme.sub} size={22} />
+                                    )}
+                                </View>
+                                
                                 <View style={styles.cardText}>
-                                    <ThemedText type="subtitle">{item.name}</ThemedText>
+                                    <ThemedText type="defaultSemiBold">{item.name}</ThemedText>
                                     {item.description && item.description.length > 0 && (
-                                        <Text style={[styles.exerciseDesc, { color: cardTheme.sub }]} numberOfLines={2}>
+                                        <ThemedText type='subtitle' style={styles.exerciseDesc}>
                                             {item.description}
-                                        </Text>
+                                        </ThemedText>
                                     )}
                                 </View>
                                 <Pressable 
-                                    onPress={() => router.push({ 
-                                        pathname: '/createExercise',
-                                        params: {
-                                            exId: item.exercise_id,
-                                            exName: item.name,
-                                            exDesc: item.description
-                                        }
-                                    })}
+                                    onPress={(e) => {
+                                        e.stopPropagation();
+                                        setModalVisible(false);
+                                        router.push({ 
+                                            pathname: '/createExercise',
+                                            params: {
+                                                exId: item.exercise_id,
+                                                exName: item.name,
+                                                exDesc: item.description
+                                            }
+                                        })
+                                    }}
+                                    hitSlop={10}
                                     style={styles.iconButton}>
-                                    <ThemedIcon name='Pencil' size={18} />
+                                    <ThemedIcon name='Pencil' size={18}/>
                                 </Pressable>
                             </Pressable>
-                        )}
-                        ListEmptyComponent={
-                            <View style={styles.emptyState}>
-                                <ThemedIcon name="ListChecks" size={26} />
-                                <ThemedText type="subtitle">No exercises yet</ThemedText>
-                            </View>
-                        }
-                    />
+                        );
+                    }}
+                    ListEmptyComponent={
+                        <View style={styles.emptyState}>
+                            <ThemedIcon name="Dumbbell" size={48} />
+                            <ThemedText type="subtitle">No exercises found</ThemedText>
+                            <ThemedText>Create a new one to get started</ThemedText>
+                        </View>
+                    }
+                />
 
+                <View style={styles.footer}>
                     <ThemedButton 
                         style={styles.createButton}
                         onPress={() => {
                             setModalVisible(false);
-                            router.push('/createExercise');
                         }}>
-                            <ThemedIcon name='Plus' />
-                            <Text>Add new Exercise</Text>
+                            <Text>Close</Text>
                     </ThemedButton>
-                </ThemedView>
-            </Modal>
-        </SafeAreaView>
-        </SafeAreaProvider>
+                </View>
+            </ThemedView>
+        </Modal>
     ) 
 }
 
@@ -130,43 +139,46 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 
-  centeredView: {
-    flex: 1,
-    alignItems: 'center',
-  },
-
   header: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: 20,
-    paddingVertical: 15,
-    marginBottom: 16,
-    gap: 20,
+    paddingVertical: 16,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+  },
+  
+  closeButton: {
+      padding: 4,
   },
 
   listContainer: {
     paddingHorizontal: 16,
+    paddingTop: 16,
     paddingBottom: 100,
   },
 
   exerciseCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderWidth: 1,
     borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
     marginBottom: 12,
+    gap: 12,
+  },
+
+  selectionIndicator: {
+      marginRight: 4,
   },
 
   cardText: {
     flex: 1,
-    gap: 4,
+    gap: 2,
   },
 
   iconButton: {
-    padding: 6,
-    borderRadius: 8,
+    padding: 8,
   },
 
   exerciseDesc: {
@@ -175,12 +187,25 @@ const styles = StyleSheet.create({
 
   emptyState: {
     alignItems: 'center',
-    paddingVertical: 40,
-    gap: 8,
+    paddingVertical: 80,
+    gap: 12,
+    opacity: 0.8,
+  },
+
+  footer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: 16,
   },
 
   createButton: {
-    marginHorizontal: 20,
-    marginBottom: 24,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 14,
+    borderRadius: 12,
+    gap: 8,
   }
 });

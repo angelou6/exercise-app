@@ -1,9 +1,17 @@
 import { ThemedButton, ThemedIcon, ThemedText, ThemedView } from '@/components/themed';
+import { getAllWourkouts } from '@/utils/database';
+import { type Workout } from '@/utils/databaseTypes';
 import { router } from 'expo-router';
-import React from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 
 const App = () => {
+  const [workouts, setWorkouts] = useState<Workout[]>([])
+
+  useEffect(() => {
+    setWorkouts(getAllWourkouts())
+  }, [])
+
   return (
     <ThemedView style={styles.container}>
       <View style={styles.header}>
@@ -14,8 +22,18 @@ const App = () => {
           </ThemedText>
         </Pressable>
       </View>
+      <FlatList
+        data={workouts}
+        keyExtractor={(item) => item.workout_id.toString()}
+        renderItem={({item}) => (
+          <Pressable>
+            <Text>{item.emoji}</Text>
+            <ThemedText>{item.name}</ThemedText>
+          </Pressable>
+        )}
+      />
       <ThemedButton 
-        onPress={() => router.push('/addWorkout')} 
+        onPress={() => router.push('/createWorkout')} 
         style={styles.add_exercise}
       >
         <ThemedIcon name='Plus' />

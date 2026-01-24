@@ -45,7 +45,7 @@ const App = () => {
           <ThemedText style={styles.label}>Exercise Name</ThemedText>
           <ThemedInput 
             value={name}
-            onChange={(e) => handleChange(e, setName)}
+            onChangeText={setName}
             style={styles.input} 
             placeholder='Enter exercise name'/>
         </View>
@@ -53,7 +53,7 @@ const App = () => {
           <ThemedText style={styles.label}>Description</ThemedText>
           <ThemedInput 
             value={desc}
-            onChange={(e) => handleChange(e, setDesc)}
+            onChangeText={setDesc}
             style={[styles.input, styles.textArea]} 
             placeholder='Enter exercise description' 
             multiline 

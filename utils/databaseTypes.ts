@@ -1,6 +1,6 @@
 export type SubmitExercise = {
-    exId: number,
-    exTime: number
+    exerciseId: number,
+    exerciseTime: number
 }
 
 export type WorkoutExercise = {
@@ -19,6 +19,6 @@ export type Exercise = {
 export type Workout = {
     workout_id: number,
     emoji: string,
-    description: string,
+    name: string,
     rest_seconds: number
 }

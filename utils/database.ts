@@ -1,5 +1,5 @@
 import { openDatabaseSync, type SQLiteDatabase } from "expo-sqlite";
-import { Exercise, SubmitExercise } from "./databaseTypes";
+import { Exercise, SubmitExercise, Workout } from "./databaseTypes";
 
 let db: SQLiteDatabase | undefined = undefined
 
@@ -45,12 +45,12 @@ export function deleteExercise(id: number) {
     db.runSync( "DELETE FROM Exercises WHERE exercise_id in ($id)", { $id: id })
 }
 
-export function getAllWourkouts() {
+export function getAllWourkouts(): Workout[] {
     const db = initDatabase();
     return db.getAllSync('SELECT * FROM Workouts');
 }
 
-export function createWorkout(emoji: string, name: string, rest_seconds: string, exercises: SubmitExercise[]) {
+export function createWorkout(emoji: string, name: string, rest_seconds: number, exercises: SubmitExercise[]) {
     const db = initDatabase();
 
     const result = db.runSync(
@@ -60,15 +60,15 @@ export function createWorkout(emoji: string, name: string, rest_seconds: string,
     const workoutId = result.lastInsertRowId;
 
     const preparedWorkout = db.prepareSync(
-        "INSERT INTO Workout_Exercises (workout_id, exercise_id, exercise_time) values ($workout_id, $exercise_id, $exercise_time)"
+        "INSERT INTO Workout_Exercises (workout_id, exercise_id, exercise_time) VALUES ($workout_id, $exercise_id, $exercise_time)"
     );
 
     try {
         for (const ex of exercises) {
             preparedWorkout.executeSync({
                 $workout_id: workoutId, 
-                $exercise_id: ex.exId, 
-                $exercise_time: ex.exTime
+                $exercise_id: ex.exerciseId, 
+                $exercise_time: ex.exerciseTime
             });
         }
     } finally {

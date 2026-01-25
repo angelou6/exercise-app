@@ -6,6 +6,7 @@ import { CardColor } from '@/constants/theme';
 import { createWorkout, getExercisesFromWorkout, updateWorkout } from '@/utils/database';
 import { type Exercise, type SubmitExercise } from '@/utils/databaseTypes';
 import { router, useLocalSearchParams } from 'expo-router';
+import { useSQLiteContext } from 'expo-sqlite';
 import { useEffect, useMemo, useState } from 'react';
 import { ListRenderItemInfo, Pressable, StyleSheet, Text, View, useColorScheme } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -13,6 +14,7 @@ import ReorderableList, { ReorderableListReorderEvent, reorderItems } from 'reac
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const App = () => {
+  const db = useSQLiteContext();
   const { wId, wEmoji, wName, wRest } = useLocalSearchParams();
 
   const theme = useColorScheme() ?? 'light';
@@ -27,6 +29,14 @@ const App = () => {
   const [emoji, setEmoji] = useState(wEmoji?.toString() || "️💪");
   const [name, setName] = useState(wName?.toString() || "");
   const [restTime, setRestTime] = useState(wRest?.toString() || "5");
+
+  useEffect(() => {
+    if (wId) {
+      const loadedExercises = getExercisesFromWorkout(db, parseInt(wId.toString()));
+      const sortedExercises = [...loadedExercises].sort((a, b) => a.order - b.order);
+      setExercises(sortedExercises);
+    }
+  }, [wId, db]);
 
   const addExercise = (newEx: Exercise, duration=defaultDuration) => {
     for (const ex of exercises) if (ex.exercise.id === newEx.id) return;
@@ -44,13 +54,13 @@ const App = () => {
 
   const handleCreateWorkout = () => {
     if (!name.trim()) return;
-    createWorkout(emoji, name, parseInt(restTime), exercises);
+    createWorkout(db, emoji, name, parseInt(restTime), exercises);
     router.push('/')
   }
 
   const handleUpdateWorkout = () => {
     if (!name.trim()) return;
-    updateWorkout(parseInt(wId.toString()), emoji, name, parseInt(restTime), exercises);
+    updateWorkout(db, parseInt(wId.toString()), emoji, name, parseInt(restTime), exercises);
     router.back()
   }
 
@@ -64,14 +74,6 @@ const App = () => {
       })
     )
   }
-
-  useEffect(() => {
-    if (wId) {
-      const loadedExercises = getExercisesFromWorkout(parseInt(wId.toString()));
-      const sortedExercises = [...loadedExercises].sort((a, b) => a.order - b.order);
-      setExercises(sortedExercises);
-    }
-  }, [wId]);
 
   const handleReorder = ({from, to}: ReorderableListReorderEvent) => {
     setExercises(value => reorderItems(value, from, to));
@@ -106,9 +108,11 @@ const App = () => {
               />
             }
             ListEmptyComponent={
-              <View style={styles.emptyState}>
-                <ThemedIcon name="Dumbbell" size={48} variant="dimmed" />
-                <ThemedText type="dimmed">No exercises</ThemedText>
+              <View style={styles.emptyContainer}>
+                <View style={styles.emptyCard}>
+                  <ThemedIcon name="ListPlus" size={48} variant="dimmed" />
+                  <ThemedText type="subtitle">No Exercises</ThemedText>
+                </View>
               </View>
             }
             ListFooterComponent={
@@ -164,11 +168,20 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  emptyState: {
+  emptyContainer: {
+    padding: 20,
     alignItems: 'center',
-    paddingTop: 60,
-    paddingBottom: 20,
-    gap: 4,
+  },
+  emptyCard: {
+    width: '100%',
+    padding: 32,
+    borderRadius: 16,
+    borderWidth: 1,
+    alignItems: 'center',
+    gap: 12,
+  },
+  emptySubtext: {
+    textAlign: 'center',
   },
   addExerciseButton: {
     flexDirection: 'row',

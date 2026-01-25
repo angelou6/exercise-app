@@ -1,11 +1,13 @@
 import { ThemedButton, ThemedIcon, ThemedInput, ThemedText } from '@/components/themed';
 import { createExercise, deleteExercise, updateExercise } from '@/utils/database';
 import { router, useLocalSearchParams } from 'expo-router';
+import { useSQLiteContext } from 'expo-sqlite';
 import React, { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const App = () => {
+  const db = useSQLiteContext();
   const { exId, exName, exDesc } = useLocalSearchParams();
 
   const [name, setName] = useState(exName?.toString() || '');
@@ -14,16 +16,16 @@ const App = () => {
 
   const handleSubmit = () => {
     if (!isEdit) {
-      createExercise(name, desc)
+      createExercise(db, name, desc)
     } else {
       if (!exId) return;
-      updateExercise(parseInt(Array.isArray(exId) ? exId[0] : exId), name, desc);
+      updateExercise(db, parseInt(Array.isArray(exId) ? exId[0] : exId), name, desc);
     }
     router.back()
   }
 
   const handleDelete = () => {
-    deleteExercise(parseInt(Array.isArray(exId) ? exId[0] : exId));
+    deleteExercise(db, parseInt(Array.isArray(exId) ? exId[0] : exId));
     router.back()
   }
 

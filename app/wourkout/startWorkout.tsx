@@ -2,22 +2,25 @@ import { ThemedButton, ThemedIcon, ThemedText } from '@/components/themed';
 import { CardColor } from '@/constants/theme';
 import { deleteWorkout, getExercisesFromWorkout, getOneWorkout } from '@/utils/database';
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
+import { useSQLiteContext } from 'expo-sqlite';
 import { useCallback, useMemo, useState } from 'react';
 import { Alert, Pressable, ScrollView, StyleSheet, Text, View, useColorScheme } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const App = () => {
+  const db = useSQLiteContext();
+
   const { workoutId } = useLocalSearchParams();
   const theme = useColorScheme() ?? 'light';
   const cardTheme = useMemo(() => theme === "light" ? CardColor.light : CardColor.dark, [theme]);
 
-  const [workout, setWorkout] = useState(getOneWorkout(workoutId.toString()));
-  const [exercises, setExercises] = useState(getExercisesFromWorkout(parseInt(workoutId.toString())));
+  const [workout, setWorkout] = useState(getOneWorkout(db, workoutId.toString()));
+  const [exercises, setExercises] = useState(getExercisesFromWorkout(db, parseInt(workoutId.toString())));
 
   useFocusEffect(
     useCallback(() => {
-      const updatedWorkout = getOneWorkout(workoutId.toString());
-      const updatedExercises = getExercisesFromWorkout(parseInt(workoutId.toString()));
+      const updatedWorkout = getOneWorkout(db, workoutId.toString());
+      const updatedExercises = getExercisesFromWorkout(db, parseInt(workoutId.toString()));
       setWorkout(updatedWorkout);
       setExercises(updatedExercises);
     }, [workoutId])
@@ -35,7 +38,7 @@ const App = () => {
       [
         { text: "Cancel", style: "cancel" },
         { text: "Delete", style: "destructive", onPress: () => {
-          deleteWorkout(parseInt(workoutId.toString()))
+          deleteWorkout(db, parseInt(workoutId.toString()))
           router.push('/');
         }}
       ]
@@ -44,7 +47,7 @@ const App = () => {
   
   const handleEdit = () => {
     router.push({
-      pathname: '/createWorkout',
+      pathname: '/wourkout/createWorkout',
       params: {
         wId: workoutId,
         wEmoji: workout.emoji,
@@ -56,7 +59,7 @@ const App = () => {
   
   const handleStart = () => {
     router.push({
-      pathname: '/workout',
+      pathname: '/wourkout/workout',
       params: {
         wId: workoutId,
         wRest: workout.rest
@@ -207,6 +210,7 @@ const styles = StyleSheet.create({
   },
   section: {
     marginBottom: 24,
+    gap: 4,
   },
   exerciseCard: {
     flexDirection: 'row',

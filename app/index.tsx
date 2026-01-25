@@ -1,49 +1,83 @@
 import { ThemedButton, ThemedIcon, ThemedText } from '@/components/themed';
+import { CardColor } from '@/constants/theme';
 import { getAllWourkouts } from '@/utils/database';
 import { type Workout } from '@/utils/databaseTypes';
-import { router } from 'expo-router';
-import React, { useEffect, useState } from 'react';
-import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
+import { router, useFocusEffect } from 'expo-router';
+import { useSQLiteContext } from 'expo-sqlite';
+import React, { useCallback, useMemo, useState } from 'react';
+import { Pressable, ScrollView, StyleSheet, Text, View, useColorScheme } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const App = () => {
+  const db = useSQLiteContext();
   const [workouts, setWorkouts] = useState<Workout[]>([])
+  const theme = useColorScheme() ?? 'light';
+  const cardTheme = useMemo(() => theme === "light" ? CardColor.light : CardColor.dark, [theme]);
 
-  useEffect(() => {
-    setWorkouts(getAllWourkouts())
-  }, [])
+  useFocusEffect(
+    useCallback(() => {
+      setWorkouts(getAllWourkouts(db))
+    }, [db])
+  )
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <ThemedText type='title'>Exercise App</ThemedText>
         <Pressable onPress={() => router.push('/settings')}>
-          <ThemedText>
-            <ThemedIcon name='Settings' />
-          </ThemedText>
+          <ThemedIcon name='Settings' size={24} />
         </Pressable>
       </View>
-      <FlatList
-        data={workouts}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({item}) => (
-          <Pressable onPress={() => router.push({
-            pathname: '/startWorkout',
-            params: {
-              workoutId: item.id
-            }
-          })}>
-            <Text>{item.emoji}</Text>
-            <ThemedText>{item.name}</ThemedText>
-          </Pressable>
-        )}
-      />
-      <ThemedButton 
-        onPress={() => router.push('/createWorkout')} 
-        style={styles.add_exercise}
-      >
-        <ThemedIcon name='Plus' />
-      </ThemedButton>
+      <ScrollView style={styles.content}>
+        <View style={styles.section}>
+          {workouts.length > 0 ? workouts.map((item) => (
+            <Pressable 
+              key={item.id}
+              onPress={() => router.push({
+                pathname: '/wourkout/startWorkout',
+                params: {
+                  workoutId: item.id
+                }
+              })}
+            >
+              <View 
+                style={[
+                  styles.workoutCard, 
+                  { 
+                    backgroundColor: cardTheme.background, 
+                    borderColor: cardTheme.border 
+                  }
+                ]}
+              >
+                <View style={styles.workoutContent}>
+                  <Text style={styles.emoji}>{item.emoji}</Text>
+                  <View style={styles.workoutInfo}>
+                    <ThemedText type="defaultSemiBold" style={styles.workoutName}>
+                      {item.name}
+                    </ThemedText>
+                  </View>
+                </View>
+              </View>
+            </Pressable>
+          )) : (
+            <View style={styles.emptyContainer}>
+              <View style={styles.emptyCard}>
+                <ThemedIcon name="Dumbbell" size={48} variant="dimmed" />
+                <ThemedText type="subtitle">No Workouts</ThemedText>
+              </View>
+            </View>
+          )}
+        </View>
+      </ScrollView>
+      <View style={styles.footer}>
+        <ThemedButton 
+          onPress={() => router.push('/wourkout/createWorkout')} 
+          style={styles.addButton}
+        >
+          <ThemedIcon name='Plus' size={24} />
+          <Text>Create Workout</Text>
+        </ThemedButton>
+      </View>
     </SafeAreaView>
   );
 };
@@ -61,12 +95,77 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
   },
 
-  add_exercise: {
-    position: 'absolute',
-    borderRadius: 50,
+  content: {
+    paddingHorizontal: 20,
+  },
+
+  section: {
+    marginBottom: 24,
+  },
+
+  workoutCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    gap: 12,
+  },
+
+  workoutContent: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+  },
+
+  emoji: {
+    fontSize: 36,
+  },
+
+  workoutInfo: {
+    flex: 1,
+    gap: 8,
+  },
+
+  workoutName: {
+    fontSize: 16,
+  },
+
+  emptyContainer: {
+    marginTop: 40,
+    alignItems: 'center',
+  },
+
+  emptyCard: {
+    width: '100%',
+    padding: 32,
+    borderRadius: 16,
+    borderWidth: 1,
+    alignItems: 'center',
+    gap: 12,
+  },
+
+  emptySubtext: {
+    textAlign: 'center',
+  },
+
+  restText: {
+    fontSize: 13,
+  },
+
+  footer: {
     padding: 20,
-    bottom: 50,
-    right: 30,
+  },
+
+  addButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 12,
+    padding: 18,
+    borderRadius: 16,
   }
 })
 

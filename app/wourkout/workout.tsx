@@ -4,18 +4,21 @@ import ProgressBar from "@/components/ui/workout/progressBar"
 import { CardColor } from "@/constants/theme"
 import { getExercisesFromWorkout } from "@/utils/database"
 import { router, useLocalSearchParams } from "expo-router"
+import { useSQLiteContext } from "expo-sqlite"
 import { useEffect, useMemo, useState } from "react"
 import { Pressable, StyleSheet, View, useColorScheme } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 
 const App = () => {
+  const db = useSQLiteContext();
+
   const { wId, wRest } = useLocalSearchParams();
   const theme = useColorScheme() ?? 'light';
   const cardTheme = useMemo(() => theme === "light" ? CardColor.light : CardColor.dark, [theme]);
 
   if (!wId || !wRest) return null;
   const [exerciseIndex, setExerciseIndex] = useState(0);
-  const exercises = getExercisesFromWorkout(parseInt(wId.toString()));
+  const exercises = getExercisesFromWorkout(db, parseInt(wId.toString()));
   const restDuration = parseInt(wRest.toString());
 
   const name = exercises[exerciseIndex].exercise.name || "";
@@ -58,7 +61,7 @@ const App = () => {
       setSCDuration(restDuration * 1000);
     } else {
       router.replace({
-        pathname: '/finishedWorkout',
+        pathname: '/wourkout/finishedWorkout',
         params: { wId }
       });
     }
@@ -122,7 +125,6 @@ const App = () => {
 
         <View style={styles.timerContainer}>
           <ThemedText style={styles.timerText}>{timeLeft}</ThemedText>
-          <ThemedText style={styles.timerUnit}>S</ThemedText>
         </View>
 
         <View style={styles.progressContainer}>
@@ -187,13 +189,6 @@ const styles = StyleSheet.create({
     fontSize: 120,
     fontWeight: 'bold',
     lineHeight: 120,
-  },
-  timerUnit: {
-    fontWeight: 'bold',
-    textAlignVertical: 'center',
-    fontSize: 50,
-    lineHeight: 50,
-    opacity: 0.7,
   },
   progressContainer: {
     width: '100%',

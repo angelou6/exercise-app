@@ -38,7 +38,6 @@ export default function CountdownModal({ visible, duration, onClose }: Countdown
       <View style={styles.topContainer}>
         <View style={styles.row}>
           <ThemedText style={styles.bigText}>{preTimeLeft}</ThemedText>
-          <ThemedText type='dimmed' style={styles.bigUnit}>S</ThemedText>
         </View>
       </View>
     </ThemedModal>
@@ -63,10 +62,5 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     lineHeight: 96,
     fontSize: 96,
-  },
-  bigUnit: {
-    fontWeight: 'bold',
-    fontSize: 40,
-    lineHeight: 50,
   },
 });

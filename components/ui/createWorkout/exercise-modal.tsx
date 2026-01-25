@@ -3,6 +3,7 @@ import { CardColor, Colors } from '@/constants/theme';
 import { getAllExercises } from '@/utils/database';
 import { SubmitExercise, type Exercise } from '@/utils/databaseTypes';
 import { router, useFocusEffect } from 'expo-router';
+import { useSQLiteContext } from 'expo-sqlite';
 import React, { useCallback, useMemo, useState } from 'react';
 import { FlatList, Pressable, StyleSheet, Text, useColorScheme, View } from 'react-native';
 
@@ -15,6 +16,7 @@ type exerciseSelect = {
 }
 
 export default function AddExerciseModal({ modalVisible, setModalVisible, addExecise, removeExercise, selected }: exerciseSelect) {
+  const db = useSQLiteContext();
   const defaultIconSize = 22;
 
   const [exercises, setExercises] = useState<Exercise[]>([]);
@@ -29,7 +31,7 @@ export default function AddExerciseModal({ modalVisible, setModalVisible, addExe
 
   useFocusEffect(
     useCallback(() => {
-      const rows = getAllExercises();
+      const rows = getAllExercises(db);
       setExercises(rows);
 
       const currentIds = new Set(rows.map(r => r.id));
@@ -38,7 +40,7 @@ export default function AddExerciseModal({ modalVisible, setModalVisible, addExe
           removeExercise(ex.exercise.id);
         }
       }
-    }, [])
+    }, [db])
   );
 
   const handleSelectExercise = (exercise: Exercise) => {
@@ -67,6 +69,14 @@ export default function AddExerciseModal({ modalVisible, setModalVisible, addExe
         data={exercises}
         keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={styles.listContainer}
+        ListEmptyComponent={
+          <View style={styles.emptyContainer}>
+            <View style={styles.emptyCard}>
+              <ThemedIcon name="Dumbbell" size={48} variant="dimmed" />
+              <ThemedText type="subtitle">No Exercises</ThemedText>
+            </View>
+          </View>
+        }
         renderItem={({ item }) => {
           const isSelected = !!selectedIncludes(item);
           return (
@@ -111,12 +121,6 @@ export default function AddExerciseModal({ modalVisible, setModalVisible, addExe
             </Pressable>
           );
         }}
-        ListEmptyComponent={
-          <View style={styles.emptyState}>
-            <ThemedIcon name="Dumbbell" size={48} variant="dimmed" />
-            <ThemedText type="subtitle">No exercises found</ThemedText>
-          </View>
-        }
       />
 
       <View style={styles.footer}>
@@ -167,11 +171,14 @@ const styles = StyleSheet.create({
   exerciseDesc: {
     fontSize: 13,
   },
-  emptyState: {
+  emptyContainer: {
     alignItems: 'center',
-    paddingVertical: 80,
+  },
+  emptyCard: {
+    width: '100%',
+    alignItems: 'center',
+    marginTop: 40,
     gap: 12,
-    opacity: 0.8,
   },
   footer: {
     position: 'absolute',

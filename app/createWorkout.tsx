@@ -7,9 +7,9 @@ import { createWorkout, getExercisesFromWorkout, updateWorkout } from '@/utils/d
 import { type Exercise, type SubmitExercise } from '@/utils/databaseTypes';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
-import { Pressable, StyleSheet, Text, View, useColorScheme } from 'react-native';
-import DraggableFlatList, { type RenderItemParams } from 'react-native-draggable-flatlist';
+import { ListRenderItemInfo, Pressable, StyleSheet, Text, View, useColorScheme } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import ReorderableList, { ReorderableListReorderEvent, reorderItems } from 'react-native-reorderable-list';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const App = () => {
@@ -73,6 +73,10 @@ const App = () => {
     }
   }, [wId]);
 
+  const handleReorder = ({from, to}: ReorderableListReorderEvent) => {
+    setExercises(value => reorderItems(value, from, to));
+  };
+
   return (
     <GestureHandlerRootView style={styles.container}>
       <SafeAreaView style={styles.container}>
@@ -85,11 +89,11 @@ const App = () => {
         />
 
         <View style={styles.container}>
-          <DraggableFlatList
+          <ReorderableList 
             data={exercises}
-            keyExtractor={(item) => item.exercise.id.toString()}
+            onReorder={handleReorder}
             keyboardShouldPersistTaps="handled"
-            onDragEnd={(data) => setExercises(data.data)}
+            keyExtractor={(item) => item.exercise.id.toString()}
             ListHeaderComponent={
               <WorkoutHeader 
                 name={name} 
@@ -113,17 +117,16 @@ const App = () => {
                 <ThemedText type="defaultSemiBold">Add Exercise</ThemedText>
               </Pressable>
             }
-          renderItem={({ item, drag }: RenderItemParams<SubmitExercise>) => (
-            <DragableItem 
-              item={item} 
-              drag={drag} 
-              cardTheme={cardTheme} 
-              defaultDuration={item.duration}
-              updateExerciseDuration={updateExerciseDuration}
-              deleteExercise={deleteExercise}
-            />
-          )}
-            />
+            renderItem={({ item }: ListRenderItemInfo<SubmitExercise>) => (
+              <DragableItem 
+                item={item} 
+                cardTheme={cardTheme} 
+                defaultDuration={item.duration}
+                updateExerciseDuration={updateExerciseDuration}
+                deleteExercise={deleteExercise}
+              />
+            )}
+          />
         </View>
         <View style={styles.footer}>
           {isEdit ? 

@@ -55,8 +55,13 @@ const App = () => {
   };
   
   const handleStart = () => {
-    // Start workout logic would go here
-    router.push('/workout');
+    router.push({
+      pathname: '/workout',
+      params: {
+        wId: workoutId,
+        wRest: workout.rest
+      }
+    });
   };
 
   return (
@@ -106,14 +111,10 @@ const App = () => {
             </View>
         </View>
         <View style={styles.section}>
-          <ThemedText type="subtitle" style={styles.sectionTitle}>Exercises</ThemedText>
-            {exercises.map((exercise, index) => (
+            {exercises.map((exercise) => (
               <View 
                 key={exercise.exercise.id} 
                 style={[styles.exerciseCard, { backgroundColor: cardTheme.background, borderColor: cardTheme.border }]}>
-                  <View style={styles.exerciseNumber}>
-                    <ThemedText type="defaultSemiBold">{index + 1}</ThemedText>
-                  </View>
                   <View style={styles.exerciseInfo}>
                     <ThemedText type="defaultSemiBold">{exercise.exercise.name}</ThemedText>
                     <View style={styles.exerciseMeta}>
@@ -207,9 +208,6 @@ const styles = StyleSheet.create({
   section: {
     marginBottom: 24,
   },
-  sectionTitle: {
-    marginBottom: 12,
-  },
   exerciseCard: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -218,14 +216,6 @@ const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 8,
     gap: 12,
-  },
-  exerciseNumber: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#007AFF',
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   exerciseInfo: {
     flex: 1,

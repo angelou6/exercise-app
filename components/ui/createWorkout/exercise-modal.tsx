@@ -7,129 +7,129 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { FlatList, Pressable, StyleSheet, Text, useColorScheme, View } from 'react-native';
 
 type exerciseSelect = {
-    modalVisible: boolean,
-    setModalVisible: React.Dispatch<React.SetStateAction<boolean>>
-    addExecise: (newEx: Exercise) => void,
-    removeExercise: (exId: number) => void,
-    selected: SubmitExercise[]
+  modalVisible: boolean,
+  setModalVisible: React.Dispatch<React.SetStateAction<boolean>>
+  addExecise: (newEx: Exercise) => void,
+  removeExercise: (exId: number) => void,
+  selected: SubmitExercise[]
 }
 
-export default function AddExerciseModal({modalVisible, setModalVisible, addExecise, removeExercise, selected}: exerciseSelect) {
-    const defaultIconSize = 22;
-    
-    const [exercises, setExercises] = useState<Exercise[]>([]);
-    const theme = useColorScheme() ?? 'light';
-    const cardTheme = useMemo(() => theme === "light" ? CardColor.dark : CardColor.light, [theme]);
+export default function AddExerciseModal({ modalVisible, setModalVisible, addExecise, removeExercise, selected }: exerciseSelect) {
+  const defaultIconSize = 22;
 
-    const tintColor = theme === 'light' ? Colors.light.tint : Colors.dark.tint;
+  const [exercises, setExercises] = useState<Exercise[]>([]);
+  const theme = useColorScheme() ?? 'light';
+  const cardTheme = useMemo(() => theme === "light" ? CardColor.dark : CardColor.light, [theme]);
 
-    const selectedIncludes = (newEx: Exercise) => {
-        return selected.find((ex) => ex.exercise.id === newEx.id)
-    }
+  const tintColor = theme === 'light' ? Colors.light.tint : Colors.dark.tint;
 
-    useFocusEffect(
-      useCallback(() => {
-        const rows = getAllExercises();
-        setExercises(rows);
-        
-        const currentIds = new Set(rows.map(r => r.id));
-        for (const ex of selected) {
-          if (!currentIds.has(ex.exercise.id)) {
-            removeExercise(ex.exercise.id);
-          }
+  const selectedIncludes = (newEx: Exercise) => {
+    return selected.find((ex) => ex.exercise.id === newEx.id)
+  }
+
+  useFocusEffect(
+    useCallback(() => {
+      const rows = getAllExercises();
+      setExercises(rows);
+
+      const currentIds = new Set(rows.map(r => r.id));
+      for (const ex of selected) {
+        if (!currentIds.has(ex.exercise.id)) {
+          removeExercise(ex.exercise.id);
         }
-      }, [])
-    );
+      }
+    }, [])
+  );
 
-    const handleSelectExercise = (exercise: Exercise) => {
-        if (selectedIncludes(exercise)) {
-            removeExercise(exercise.id);
-        } else {
-            addExecise(exercise);
-        }
+  const handleSelectExercise = (exercise: Exercise) => {
+    if (selectedIncludes(exercise)) {
+      removeExercise(exercise.id);
+    } else {
+      addExecise(exercise);
     }
+  }
 
-    return(
-        <ThemedModal
-            animationType="slide"
-            presentationStyle="pageSheet"
-            visible={modalVisible}
-            onRequestClose={() => {
-                setModalVisible(!modalVisible);
-            }}>
-            <View style={styles.header}>
-                <ThemedText type='title'>Select Exercises</ThemedText>
-                <Pressable onPress={() => router.push('/createExercise')}>
-                    <ThemedIcon name='Plus' />
-                </Pressable>
-            </View>
-            <FlatList
-                data={exercises}
-                keyExtractor={(item) => item.id.toString()}
-                contentContainerStyle={styles.listContainer}
-                renderItem={({item}) => {
-                    const isSelected = !!selectedIncludes(item);
-                    return (
-                        <Pressable 
-                            style={[
-                                styles.exerciseCard,
-                            ]}
-                            onPress={() => handleSelectExercise(item)}>
-                            <View style={styles.selectionIndicator}>
-                                {isSelected ? (
-                                    <ThemedIcon name="CheckCircle2" color={tintColor} size={defaultIconSize} />
-                                ) : (
-                                    <ThemedIcon variant='dimmed' name="Circle" color={cardTheme.sub} size={defaultIconSize} />
-                                )}
-                            </View>
-                            
-                            <View style={styles.cardText}>
-                                <ThemedText type="defaultSemiBold">{item.name}</ThemedText>
-                                {item.description && item.description.length > 0 && (
-                                    <ThemedText type='subtitle' style={styles.exerciseDesc}>
-                                        {item.description}
-                                    </ThemedText>
-                                )}
-                            </View>
-                            <Pressable 
-                                onPress={(e) => {
-                                    e.stopPropagation();
-                                    setModalVisible(false);
-                                    router.push({ 
-                                        pathname: '/createExercise',
-                                        params: {
-                                            exId: item.id,
-                                            exName: item.name,
-                                            exDesc: item.description
-                                        }
-                                    })
-                                }}
-                                hitSlop={10}
-                                style={styles.iconButton}>
-                                <ThemedIcon name='Pencil' size={18}/>
-                            </Pressable>
-                        </Pressable>
-                    );
+  return (
+    <ThemedModal
+      animationType="slide"
+      presentationStyle="pageSheet"
+      visible={modalVisible}
+      onRequestClose={() => {
+        setModalVisible(!modalVisible);
+      }}>
+      <View style={styles.header}>
+        <ThemedText type='title'>Select Exercises</ThemedText>
+        <Pressable onPress={() => router.push('/createExercise')}>
+          <ThemedIcon name='Plus' />
+        </Pressable>
+      </View>
+      <FlatList
+        data={exercises}
+        keyExtractor={(item) => item.id.toString()}
+        contentContainerStyle={styles.listContainer}
+        renderItem={({ item }) => {
+          const isSelected = !!selectedIncludes(item);
+          return (
+            <Pressable
+              style={[
+                styles.exerciseCard,
+              ]}
+              onPress={() => handleSelectExercise(item)}>
+              <View style={styles.selectionIndicator}>
+                {isSelected ? (
+                  <ThemedIcon name="CheckCircle2" color={tintColor} size={defaultIconSize} />
+                ) : (
+                  <ThemedIcon variant='dimmed' name="Circle" color={cardTheme.sub} size={defaultIconSize} />
+                )}
+              </View>
+
+              <View style={styles.cardText}>
+                <ThemedText type="defaultSemiBold">{item.name}</ThemedText>
+                {item.description && item.description.length > 0 && (
+                  <ThemedText type='subtitle' style={styles.exerciseDesc}>
+                    {item.description}
+                  </ThemedText>
+                )}
+              </View>
+              <Pressable
+                onPress={(e) => {
+                  e.stopPropagation();
+                  setModalVisible(false);
+                  router.push({
+                    pathname: '/createExercise',
+                    params: {
+                      exId: item.id,
+                      exName: item.name,
+                      exDesc: item.description
+                    }
+                  })
                 }}
-                ListEmptyComponent={
-                    <View style={styles.emptyState}>
-                        <ThemedIcon name="Dumbbell" size={48} variant="dimmed" />
-                        <ThemedText type="subtitle">No exercises found</ThemedText>
-                    </View>
-                }
-            />
+                hitSlop={10}
+                style={styles.iconButton}>
+                <ThemedIcon name='Pencil' size={18} />
+              </Pressable>
+            </Pressable>
+          );
+        }}
+        ListEmptyComponent={
+          <View style={styles.emptyState}>
+            <ThemedIcon name="Dumbbell" size={48} variant="dimmed" />
+            <ThemedText type="subtitle">No exercises found</ThemedText>
+          </View>
+        }
+      />
 
-            <View style={styles.footer}>
-                <ThemedButton 
-                    style={styles.createButton}
-                    onPress={() => {
-                        setModalVisible(false);
-                    }}>
-                        <Text>Close</Text>
-                </ThemedButton>
-            </View>
-        </ThemedModal>
-    ) 
+      <View style={styles.footer}>
+        <ThemedButton
+          style={styles.createButton}
+          onPress={() => {
+            setModalVisible(false);
+          }}>
+          <Text>Close</Text>
+        </ThemedButton>
+      </View>
+    </ThemedModal>
+  )
 }
 
 const styles = StyleSheet.create({

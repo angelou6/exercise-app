@@ -6,7 +6,7 @@ import { CardColor } from '@/constants/theme';
 import { createWorkout, getExercisesFromWorkout, updateWorkout } from '@/utils/database';
 import { type Exercise, type SubmitExercise } from '@/utils/databaseTypes';
 import { router, useLocalSearchParams } from 'expo-router';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Pressable, StyleSheet, Text, View, useColorScheme } from 'react-native';
 import DraggableFlatList, { type RenderItemParams } from 'react-native-draggable-flatlist';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -19,7 +19,7 @@ const App = () => {
   const cardTheme = useMemo(() => theme === "light" ? CardColor.light : CardColor.dark, [theme]);
 
   const defaultDuration = 30;
-  let isEdit = false;
+  const isEdit = !!wId;
 
   const [modalVisible, setModalVisible] = useState(false);
   const [exercises, setExercises] = useState<SubmitExercise[]>([]);
@@ -65,15 +65,13 @@ const App = () => {
     )
   }
 
-  if (wId) {
-    isEdit = true;
-    const exercises = getExercisesFromWorkout(parseInt(wId.toString()))
-    const sortedExercises = [...exercises].sort((a, b) => a.order - b.order).reverse();
-
-    for (const ex of sortedExercises) {
-      addExercise(ex.exercise, ex.duration)
+  useEffect(() => {
+    if (wId) {
+      const loadedExercises = getExercisesFromWorkout(parseInt(wId.toString()));
+      const sortedExercises = [...loadedExercises].sort((a, b) => a.order - b.order);
+      setExercises(sortedExercises);
     }
-  }
+  }, [wId]);
 
   return (
     <GestureHandlerRootView style={styles.container}>
@@ -163,37 +161,27 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-
   emptyState: {
     alignItems: 'center',
     paddingTop: 60,
     paddingBottom: 20,
     gap: 4,
   },
-
   addExerciseButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
   },
-
   footer: {
     padding: 16,
   },
-
   saveButton: {
-    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 12,
-    paddingVertical: 16,
-    gap: 10,
   },
-
   saveButtonText: {
     fontSize: 16,
-    fontWeight: '700',
   },
 })
 

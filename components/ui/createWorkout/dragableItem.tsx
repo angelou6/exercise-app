@@ -12,8 +12,7 @@ type Item = {
     deleteExercise: (id: number) => void
 }
 
-export default function DragableItem(
-    {item, drag, cardTheme, updateExerciseDuration, defaultDuration, deleteExercise}: Item) {
+export default function DragableItem({item, drag, cardTheme, updateExerciseDuration, defaultDuration, deleteExercise}: Item) {
     return (
         <View style={[ styles.card, { 
             backgroundColor: cardTheme.background, 

@@ -14,8 +14,9 @@ type exerciseSelect = {
     selected: SubmitExercise[]
 }
 
-export default function AddExerciseModal(
-    {modalVisible, setModalVisible, addExecise, removeExercise, selected}: exerciseSelect) {
+export default function AddExerciseModal({modalVisible, setModalVisible, addExecise, removeExercise, selected}: exerciseSelect) {
+    const defaultIconSize = 22;
+    
     const [exercises, setExercises] = useState<Exercise[]>([]);
     const theme = useColorScheme() ?? 'light';
     const cardTheme = useMemo(() => theme === "light" ? CardColor.dark : CardColor.light, [theme]);
@@ -58,7 +59,7 @@ export default function AddExerciseModal(
             }}>
             <View style={styles.header}>
                 <ThemedText type='title'>Select Exercises</ThemedText>
-                <Pressable onPress={() => router.push('/createExercise')} style={styles.closeButton}>
+                <Pressable onPress={() => router.push('/createExercise')}>
                     <ThemedIcon name='Plus' />
                 </Pressable>
             </View>
@@ -72,14 +73,13 @@ export default function AddExerciseModal(
                         <Pressable 
                             style={[
                                 styles.exerciseCard,
-                                {backgroundColor: cardTheme.background}
                             ]}
                             onPress={() => handleSelectExercise(item)}>
                             <View style={styles.selectionIndicator}>
                                 {isSelected ? (
-                                    <ThemedIcon name="CheckCircle2" color={tintColor} size={22} />
+                                    <ThemedIcon name="CheckCircle2" color={tintColor} size={defaultIconSize} />
                                 ) : (
-                                    <ThemedIcon name="Circle" color={cardTheme.sub} size={22} />
+                                    <ThemedIcon variant='dimmed' name="Circle" color={cardTheme.sub} size={defaultIconSize} />
                                 )}
                             </View>
                             
@@ -113,9 +113,8 @@ export default function AddExerciseModal(
                 }}
                 ListEmptyComponent={
                     <View style={styles.emptyState}>
-                        <ThemedIcon name="Dumbbell" size={48} />
+                        <ThemedIcon name="Dumbbell" size={48} variant="dimmed" />
                         <ThemedText type="subtitle">No exercises found</ThemedText>
-                        <ThemedText>Create a new one to get started</ThemedText>
                     </View>
                 }
             />
@@ -142,10 +141,6 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
   },
   
-  closeButton: {
-    padding: 4,
-  },
-
   listContainer: {
     paddingHorizontal: 16,
     paddingTop: 16,
@@ -163,7 +158,7 @@ const styles = StyleSheet.create({
   },
 
   selectionIndicator: {
-      marginRight: 4,
+    marginRight: 4,
   },
 
   cardText: {

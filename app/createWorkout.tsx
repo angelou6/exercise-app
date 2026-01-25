@@ -81,8 +81,8 @@ const App = () => {
             }
             ListEmptyComponent={
               <View style={styles.emptyState}>
-                <ThemedIcon name="Dumbbell" size={48} color={cardTheme.sub} />
-                <ThemedText type="default" style={{color: cardTheme.sub, marginTop: 8}}>No exercises</ThemedText>
+                <ThemedIcon name="Dumbbell" size={48} variant="dimmed" />
+                <ThemedText type="dimmed">No exercises</ThemedText>
               </View>
             }
             ListFooterComponent={

@@ -15,8 +15,7 @@ type Header = {
     cardTheme: CardTheme,
 }
 
-export default function WorkoutHeader(
-        {name, setName, emoji, setEmoji, restTime, setRestTime, cardTheme}: Header) {
+export default function WorkoutHeader({name, setName, emoji, setEmoji, restTime, setRestTime, cardTheme}: Header) {
     const defaultRestTime = 5;
     const [isOpen, setIsOpen] = useState<boolean>(false)
 

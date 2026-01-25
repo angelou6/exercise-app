@@ -67,12 +67,11 @@ export function createWorkout(emoji: string, name: string, rest_seconds: number,
         for (const ex of exercises) {
             preparedWorkout.executeSync({
                 $workout_id: workoutId, 
-                $exercise_id: ex.exerciseId, 
-                $exercise_time: ex.exerciseTime
+                $exercise_id: ex.exercise.exercise_id, 
+                $exercise_time: ex.duration
             });
         }
     } finally {
         preparedWorkout.finalizeSync();
     }
-    
 }

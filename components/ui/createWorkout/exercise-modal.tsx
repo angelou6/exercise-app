@@ -1,28 +1,29 @@
+import { ThemedButton, ThemedIcon, ThemedText, ThemedView } from '@/components/themed';
 import { CardColor, Colors } from '@/constants/theme';
 import { getAllExercises } from '@/utils/database';
-import { type Exercise } from '@/utils/databaseTypes';
+import { SubmitExercise, type Exercise } from '@/utils/databaseTypes';
 import { router, useFocusEffect } from 'expo-router';
 import React, { useCallback, useMemo, useState } from 'react';
 import { FlatList, Modal, Pressable, StyleSheet, Text, useColorScheme, View } from 'react-native';
-import { ThemedButton, ThemedIcon, ThemedText, ThemedView } from "../themed";
 
 type exerciseSelect = {
     modalVisible: boolean,
     setModalVisible: React.Dispatch<React.SetStateAction<boolean>>
     addExecise: (newEx: Exercise) => void,
     removeExercise: (exId: number) => void,
-    selected: Exercise[]
+    selected: SubmitExercise[]
 }
 
 export default function AddExerciseModal(
     {modalVisible, setModalVisible, addExecise, removeExercise, selected}: exerciseSelect) {
     const [exercises, setExercises] = useState<Exercise[]>([]);
     const theme = useColorScheme() ?? 'light';
-    const cardTheme = useMemo(() => theme === "light" ? CardColor.light : CardColor.dark, [theme]);
+    const cardTheme = useMemo(() => theme === "light" ? CardColor.dark : CardColor.light, [theme]);
+
     const tintColor = theme === 'light' ? Colors.light.tint : Colors.dark.tint;
 
     const selectedIncludes = (newEx: Exercise) => {
-        return selected.find((ex) => ex.exercise_id === newEx.exercise_id)
+        return selected.find((ex) => ex.exercise.exercise_id === newEx.exercise_id)
     }
 
     useFocusEffect(
@@ -32,8 +33,8 @@ export default function AddExerciseModal(
         
         const currentIds = new Set(rows.map(r => r.exercise_id));
         for (const ex of selected) {
-          if (!currentIds.has(ex.exercise_id)) {
-            removeExercise(ex.exercise_id);
+          if (!currentIds.has(ex.exercise.exercise_id)) {
+            removeExercise(ex.exercise.exercise_id);
           }
         }
       }, [])
@@ -145,11 +146,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 20,
     paddingVertical: 16,
-    borderBottomWidth: StyleSheet.hairlineWidth,
   },
   
   closeButton: {
-      padding: 4,
+    padding: 4,
   },
 
   listContainer: {

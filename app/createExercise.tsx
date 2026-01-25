@@ -2,7 +2,7 @@ import { ThemedButton, ThemedIcon, ThemedInput, ThemedText, ThemedView } from '@
 import { createExercise, deleteExercise, updateExercise } from '@/utils/database';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useState } from 'react';
-import { Pressable, StyleSheet, Text, TextInputChangeEvent, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 const App = () => {
   const { exId, exName, exDesc } = useLocalSearchParams();
@@ -10,12 +10,6 @@ const App = () => {
   const [name, setName] = useState(exName?.toString() || '');
   const [desc, setDesc] = useState(exDesc?.toString() || '');
   const [isEdit, _] = useState(!!exId);
-
-  const handleChange = (
-      e: TextInputChangeEvent, 
-      setState: React.Dispatch<React.SetStateAction<string>>) => {
-    setState(e.nativeEvent.text);
-  }
 
   const handleSubmit = () => {
     if (!isEdit) {

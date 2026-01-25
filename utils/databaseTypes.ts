@@ -1,6 +1,6 @@
 export type SubmitExercise = {
-    exerciseId: number,
-    exerciseTime: number
+    exercise: Exercise,
+    duration: number
 }
 
 export type WorkoutExercise = {

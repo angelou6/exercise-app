@@ -25,9 +25,14 @@ const App = () => {
       </View>
       <FlatList
         data={workouts}
-        keyExtractor={(item) => item.workout_id.toString()}
+        keyExtractor={(item) => item.id.toString()}
         renderItem={({item}) => (
-          <Pressable>
+          <Pressable onPress={() => router.push({
+            pathname: '/startWorkout',
+            params: {
+              workoutId: item.id
+            }
+          })}>
             <Text>{item.emoji}</Text>
             <ThemedText>{item.name}</ThemedText>
           </Pressable>

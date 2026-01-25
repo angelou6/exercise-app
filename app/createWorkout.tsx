@@ -3,9 +3,9 @@ import DragableItem from '@/components/ui/createWorkout/dragableItem';
 import AddExerciseModal from '@/components/ui/createWorkout/exercise-modal';
 import WorkoutHeader from '@/components/ui/createWorkout/header';
 import { CardColor } from '@/constants/theme';
-import { createWorkout } from '@/utils/database';
+import { createWorkout, getExercisesFromWorkout, updateWorkout } from '@/utils/database';
 import { type Exercise, type SubmitExercise } from '@/utils/databaseTypes';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Pressable, StyleSheet, Text, View, useColorScheme } from 'react-native';
 import DraggableFlatList, { type RenderItemParams } from 'react-native-draggable-flatlist';
@@ -13,31 +13,45 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const App = () => {
+  const { wId, wEmoji, wName, wRest } = useLocalSearchParams();
+
   const theme = useColorScheme() ?? 'light';
   const cardTheme = useMemo(() => theme === "light" ? CardColor.light : CardColor.dark, [theme]);
 
   const defaultDuration = 30;
+  let isEdit = false;
 
-  const [emoji, setEmoji] = useState("️💪");
   const [modalVisible, setModalVisible] = useState(false);
   const [exercises, setExercises] = useState<SubmitExercise[]>([]);
-  const [name, setName] = useState("");
-  const [restTime, setRestTime] = useState("5");
+
+  const [emoji, setEmoji] = useState(wEmoji?.toString() || "️💪");
+  const [name, setName] = useState(wName?.toString() || "");
+  const [restTime, setRestTime] = useState(wRest?.toString() || "5");
 
   const addExercise = (newEx: Exercise) => {
-    for (const ex of exercises) if (ex.exercise.exercise_id === newEx.exercise_id) return;
-    const submitEx: SubmitExercise = {exercise: newEx, duration: defaultDuration}
+    for (const ex of exercises) if (ex.exercise.id === newEx.id) return;
+    const submitEx: SubmitExercise = {
+      exercise: newEx, 
+      order: exercises.length+1,
+      duration: defaultDuration
+    }
     setExercises([...exercises, submitEx])
   }
 
   const deleteExercise = (id: number) => {
-    setExercises(exercises.filter((ex) => ex.exercise.exercise_id !== id))
+    setExercises(exercises.filter((ex) => ex.exercise.id !== id))
   }
 
   const handleCreateWorkout = () => {
     if (!name.trim()) return;
     createWorkout(emoji, name, parseInt(restTime), exercises);
     router.push('/')
+  }
+
+  const handleUpdateWorkout = () => {
+    if (!name.trim()) return;
+    updateWorkout(parseInt(wId.toString()), emoji, name, parseInt(restTime), exercises);
+    router.back()
   }
 
   const updateExerciseDuration = (exercise: SubmitExercise, time: number) => {
@@ -49,6 +63,16 @@ const App = () => {
         return ex
       })
     )
+  }
+
+  if (wId) {
+    isEdit = true;
+    const exercises = getExercisesFromWorkout(parseInt(wId.toString()))
+    const sortedExercises = [...exercises].sort((a, b) => a.order - b.order).reverse();
+
+    for (const ex of sortedExercises) {
+      addExercise(ex.exercise)
+    }
   }
 
   return (
@@ -65,7 +89,7 @@ const App = () => {
         <View style={styles.container}>
           <DraggableFlatList
             data={exercises}
-            keyExtractor={(item) => item.exercise.exercise_id.toString()}
+            keyExtractor={(item) => item.exercise.id.toString()}
             keyboardShouldPersistTaps="handled"
             onDragEnd={(data) => setExercises(data.data)}
             ListHeaderComponent={
@@ -104,17 +128,31 @@ const App = () => {
             />
         </View>
         <View style={styles.footer}>
-          <ThemedButton 
-            onPress={() => handleCreateWorkout()} 
-            style={[
-              styles.saveButton, 
-              (!name.trim() || exercises.length === 0) && { opacity: 0.5 }
-            ]}
-            disabled={!name.trim() || exercises.length === 0}
-          >
-            <ThemedIcon name="Check" size={20} />
-            <Text style={styles.saveButtonText}>Save Workout</Text>
-          </ThemedButton>
+          {isEdit ? 
+            <ThemedButton 
+              onPress={() => handleUpdateWorkout()} 
+              style={[
+                styles.saveButton, 
+                (!name.trim() || exercises.length === 0) && { opacity: 0.5 }
+              ]}
+              disabled={!name.trim() || exercises.length === 0}
+            >
+              <ThemedIcon name="Save" size={20} />
+              <Text style={styles.saveButtonText}>Update Workout</Text>
+            </ThemedButton>
+          :
+            <ThemedButton 
+              onPress={() => handleCreateWorkout()} 
+              style={[
+                styles.saveButton, 
+                (!name.trim() || exercises.length === 0) && { opacity: 0.5 }
+              ]}
+              disabled={!name.trim() || exercises.length === 0}
+            >
+              <ThemedIcon name="Check" size={20} />
+              <Text style={styles.saveButtonText}>Save Workout</Text>
+            </ThemedButton>
+          }
         </View>
       </SafeAreaView>
     </GestureHandlerRootView>

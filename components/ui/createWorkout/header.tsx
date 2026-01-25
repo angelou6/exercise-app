@@ -78,12 +78,10 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     gap: 16,
   },
-
   backButton: {
     padding: 8,
     marginLeft: -8,
   },
-
   section: {
     marginHorizontal: 20,
     borderRadius: 16,
@@ -91,14 +89,12 @@ const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 24,
   },
-
   topRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 16,
     marginBottom: 16,
   },
-
   emojiButton: {
     width: 64,
     height: 64,
@@ -106,36 +102,30 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-
   emoji: {
     fontSize: 32,
   },
-
   workoutName: {
     fontSize: 18,
     width: 1000,
     fontWeight: 'bold',
   },
-
   restRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-
   restInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
   },
-
   restInputField: {
     width: 50,
     textAlign: 'center',
     fontSize: 16,
     paddingVertical: 4,
   },
-
   unit: {
     opacity: 0.6,
   },

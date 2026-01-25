@@ -71,7 +71,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -80,22 +79,18 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     gap: 20,
   },
-
   form: {
     paddingHorizontal: 20,
     gap: 24,
   },
-
   formGroup: {
     gap: 8,
   },
-
   label: {
     fontSize: 14,
     fontWeight: '600',
     marginLeft: 4,
   },
-
   input: {
     paddingHorizontal: 16,
     paddingVertical: 12,
@@ -103,13 +98,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ddd',
   },
-
   textArea: {
     minHeight: 100,
     paddingTop: 12,
     textAlignVertical: 'top',
   },
-
   deleteButton: {
     backgroundColor: 'transparent',
   }

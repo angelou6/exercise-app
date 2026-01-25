@@ -41,7 +41,7 @@ export default function DragableItem({item, drag, cardTheme, updateExerciseDurat
             </View>
             <Pressable 
                 style={styles.iconButton} 
-                onPress={() => deleteExercise(item.exercise.exercise_id)}>
+                onPress={() => deleteExercise(item.exercise.id)}>
                 <ThemedIcon name="Trash2" size={20} color={cardTheme.sub} />
             </Pressable>
             </View>
@@ -59,27 +59,22 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     marginBottom: 12,
   },
-
   dragHandle: {
     padding: 8,
   },
-
   cardTextBlock: {
     flex: 1,
     marginHorizontal: 8,
   },
-
   smallText: {
     fontSize: 13,
     marginTop: 2,
   },
-
   cardActions: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
   },
-  
   exTime: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -87,20 +82,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 4,
   },
-
   timeInput: {
     width: 30,
     textAlign: 'center',
     fontSize: 14,
     padding: 0,
   },
-
   timeUnit: {
     fontSize: 12,
     opacity: 0.6,
     marginLeft: 2,
   },
-
   iconButton: {
     padding: 4,
   },

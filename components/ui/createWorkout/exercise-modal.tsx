@@ -24,7 +24,7 @@ export default function AddExerciseModal({modalVisible, setModalVisible, addExec
     const tintColor = theme === 'light' ? Colors.light.tint : Colors.dark.tint;
 
     const selectedIncludes = (newEx: Exercise) => {
-        return selected.find((ex) => ex.exercise.exercise_id === newEx.exercise_id)
+        return selected.find((ex) => ex.exercise.id === newEx.id)
     }
 
     useFocusEffect(
@@ -32,10 +32,10 @@ export default function AddExerciseModal({modalVisible, setModalVisible, addExec
         const rows = getAllExercises();
         setExercises(rows);
         
-        const currentIds = new Set(rows.map(r => r.exercise_id));
+        const currentIds = new Set(rows.map(r => r.id));
         for (const ex of selected) {
-          if (!currentIds.has(ex.exercise.exercise_id)) {
-            removeExercise(ex.exercise.exercise_id);
+          if (!currentIds.has(ex.exercise.id)) {
+            removeExercise(ex.exercise.id);
           }
         }
       }, [])
@@ -43,7 +43,7 @@ export default function AddExerciseModal({modalVisible, setModalVisible, addExec
 
     const handleSelectExercise = (exercise: Exercise) => {
         if (selectedIncludes(exercise)) {
-            removeExercise(exercise.exercise_id);
+            removeExercise(exercise.id);
         } else {
             addExecise(exercise);
         }
@@ -65,7 +65,7 @@ export default function AddExerciseModal({modalVisible, setModalVisible, addExec
             </View>
             <FlatList
                 data={exercises}
-                keyExtractor={(item) => item.exercise_id.toString()}
+                keyExtractor={(item) => item.id.toString()}
                 contentContainerStyle={styles.listContainer}
                 renderItem={({item}) => {
                     const isSelected = !!selectedIncludes(item);
@@ -98,7 +98,7 @@ export default function AddExerciseModal({modalVisible, setModalVisible, addExec
                                     router.push({ 
                                         pathname: '/createExercise',
                                         params: {
-                                            exId: item.exercise_id,
+                                            exId: item.id,
                                             exName: item.name,
                                             exDesc: item.description
                                         }
@@ -140,13 +140,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 16,
   },
-  
   listContainer: {
     paddingHorizontal: 16,
     paddingTop: 16,
     paddingBottom: 100,
   },
-
   exerciseCard: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -156,31 +154,25 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     gap: 12,
   },
-
   selectionIndicator: {
     marginRight: 4,
   },
-
   cardText: {
     flex: 1,
     gap: 2,
   },
-
   iconButton: {
     padding: 8,
   },
-
   exerciseDesc: {
     fontSize: 13,
   },
-
   emptyState: {
     alignItems: 'center',
     paddingVertical: 80,
     gap: 12,
     opacity: 0.8,
   },
-
   footer: {
     position: 'absolute',
     bottom: 0,
@@ -188,7 +180,6 @@ const styles = StyleSheet.create({
     right: 0,
     padding: 16,
   },
-
   createButton: {
     flexDirection: 'row',
     alignItems: 'center',

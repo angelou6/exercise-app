@@ -1,5 +1,6 @@
 export type SubmitExercise = {
     exercise: Exercise,
+    order: number,
     duration: number
 }
 
@@ -7,18 +8,18 @@ export type WorkoutExercise = {
     id: number,
     workout_id: number,
     exercise_id: number,
-    exercise_time: number,
+    duration: number,
 }
 
 export type Exercise = {
-    exercise_id: number,
+    id: number,
     name: string,
     description: string
 }
 
 export type Workout = {
-    workout_id: number,
+    id: number,
     emoji: string,
     name: string,
-    rest_seconds: number
+    rest: number
 }

@@ -24,7 +24,18 @@ export default function RootLayout() {
 }
 
 async function migration(db: SQLiteDatabase) {
+  const RESET_DB = false; 
+  
+  if (RESET_DB) {
+    await db.execAsync(`
+      DROP TABLE IF EXISTS Workout_Exercises;
+      DROP TABLE IF EXISTS Workouts;
+      DROP TABLE IF EXISTS Exercises;
+      PRAGMA user_version = 0;
+    `);
+  }
   const DATABASE_VERSION = 1;
+
   let result = await db.getFirstAsync<{ user_version: number }>(
     'PRAGMA user_version'
   );
@@ -35,28 +46,28 @@ async function migration(db: SQLiteDatabase) {
     await db.execAsync(`
         PRAGMA foreign_keys = ON;
 
-        CREATE TABLE IF NOT EXISTS Exercises (
-            exercise_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        CREATE TABLE IF NOT EXISTS exercises (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
             description TEXT
         );
 
-        CREATE TABLE IF NOT EXISTS Workouts (
-            workout_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        CREATE TABLE IF NOT EXISTS workouts (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
             emoji TEXT NOT NULL,
             name TEXT NOT NULL,
-            rest_seconds INTEGER
+            rest INTEGER
         );
 
-        CREATE TABLE IF NOT EXISTS Workout_Exercises (
+        CREATE TABLE IF NOT EXISTS workout_exercises (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             workout_id INTEGER NOT NULL,
             exercise_id INTEGER NOT NULL,
-            
-            exercise_time INTEGER,
+            duration INTEGER,
+            exercise_order INTEGER NOT NULL,
 
-            FOREIGN KEY (workout_id) REFERENCES Workouts(workout_id) ON DELETE CASCADE,
-            FOREIGN KEY (exercise_id) REFERENCES Exercises(exercise_id)
+            FOREIGN KEY (workout_id) REFERENCES workouts(id) ON DELETE CASCADE,
+            FOREIGN KEY (exercise_id) REFERENCES exercises(id) ON DELETE CASCADE
         );
     `);
     currentDbVersion = 1;

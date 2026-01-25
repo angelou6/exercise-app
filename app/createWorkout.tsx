@@ -28,12 +28,12 @@ const App = () => {
   const [name, setName] = useState(wName?.toString() || "");
   const [restTime, setRestTime] = useState(wRest?.toString() || "5");
 
-  const addExercise = (newEx: Exercise) => {
+  const addExercise = (newEx: Exercise, duration=defaultDuration) => {
     for (const ex of exercises) if (ex.exercise.id === newEx.id) return;
     const submitEx: SubmitExercise = {
       exercise: newEx, 
       order: exercises.length+1,
-      duration: defaultDuration
+      duration: duration
     }
     setExercises([...exercises, submitEx])
   }
@@ -71,7 +71,7 @@ const App = () => {
     const sortedExercises = [...exercises].sort((a, b) => a.order - b.order).reverse();
 
     for (const ex of sortedExercises) {
-      addExercise(ex.exercise)
+      addExercise(ex.exercise, ex.duration)
     }
   }
 
@@ -120,7 +120,7 @@ const App = () => {
               item={item} 
               drag={drag} 
               cardTheme={cardTheme} 
-              defaultDuration={defaultDuration}
+              defaultDuration={item.duration}
               updateExerciseDuration={updateExerciseDuration}
               deleteExercise={deleteExercise}
             />

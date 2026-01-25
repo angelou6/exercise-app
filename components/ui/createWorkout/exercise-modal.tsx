@@ -1,10 +1,10 @@
-import { ThemedButton, ThemedIcon, ThemedText, ThemedView } from '@/components/themed';
+import { ThemedButton, ThemedIcon, ThemedModal, ThemedText } from '@/components/themed';
 import { CardColor, Colors } from '@/constants/theme';
 import { getAllExercises } from '@/utils/database';
 import { SubmitExercise, type Exercise } from '@/utils/databaseTypes';
 import { router, useFocusEffect } from 'expo-router';
 import React, { useCallback, useMemo, useState } from 'react';
-import { FlatList, Modal, Pressable, StyleSheet, Text, useColorScheme, View } from 'react-native';
+import { FlatList, Pressable, StyleSheet, Text, useColorScheme, View } from 'react-native';
 
 type exerciseSelect = {
     modalVisible: boolean,
@@ -49,97 +49,91 @@ export default function AddExerciseModal(
     }
 
     return(
-        <Modal
+        <ThemedModal
             animationType="slide"
             presentationStyle="pageSheet"
             visible={modalVisible}
             onRequestClose={() => {
                 setModalVisible(!modalVisible);
             }}>
-            <ThemedView style={styles.container}>
-                <View style={styles.header}>
-                    <ThemedText type='title'>Select Exercises</ThemedText>
-                    <Pressable onPress={() => router.push('/createExercise')} style={styles.closeButton}>
-                        <ThemedIcon name='Plus' />
-                    </Pressable>
-                </View>
-                <FlatList
-                    data={exercises}
-                    keyExtractor={(item) => item.exercise_id.toString()}
-                    contentContainerStyle={styles.listContainer}
-                    renderItem={({item}) => {
-                        const isSelected = !!selectedIncludes(item);
-                        return (
+            <View style={styles.header}>
+                <ThemedText type='title'>Select Exercises</ThemedText>
+                <Pressable onPress={() => router.push('/createExercise')} style={styles.closeButton}>
+                    <ThemedIcon name='Plus' />
+                </Pressable>
+            </View>
+            <FlatList
+                data={exercises}
+                keyExtractor={(item) => item.exercise_id.toString()}
+                contentContainerStyle={styles.listContainer}
+                renderItem={({item}) => {
+                    const isSelected = !!selectedIncludes(item);
+                    return (
+                        <Pressable 
+                            style={[
+                                styles.exerciseCard,
+                                {backgroundColor: cardTheme.background}
+                            ]}
+                            onPress={() => handleSelectExercise(item)}>
+                            <View style={styles.selectionIndicator}>
+                                {isSelected ? (
+                                    <ThemedIcon name="CheckCircle2" color={tintColor} size={22} />
+                                ) : (
+                                    <ThemedIcon name="Circle" color={cardTheme.sub} size={22} />
+                                )}
+                            </View>
+                            
+                            <View style={styles.cardText}>
+                                <ThemedText type="defaultSemiBold">{item.name}</ThemedText>
+                                {item.description && item.description.length > 0 && (
+                                    <ThemedText type='subtitle' style={styles.exerciseDesc}>
+                                        {item.description}
+                                    </ThemedText>
+                                )}
+                            </View>
                             <Pressable 
-                                style={[
-                                    styles.exerciseCard,
-                                    {backgroundColor: cardTheme.background}
-                                ]}
-                                onPress={() => handleSelectExercise(item)}>
-                                <View style={styles.selectionIndicator}>
-                                    {isSelected ? (
-                                        <ThemedIcon name="CheckCircle2" color={tintColor} size={22} />
-                                    ) : (
-                                        <ThemedIcon name="Circle" color={cardTheme.sub} size={22} />
-                                    )}
-                                </View>
-                                
-                                <View style={styles.cardText}>
-                                    <ThemedText type="defaultSemiBold">{item.name}</ThemedText>
-                                    {item.description && item.description.length > 0 && (
-                                        <ThemedText type='subtitle' style={styles.exerciseDesc}>
-                                            {item.description}
-                                        </ThemedText>
-                                    )}
-                                </View>
-                                <Pressable 
-                                    onPress={(e) => {
-                                        e.stopPropagation();
-                                        setModalVisible(false);
-                                        router.push({ 
-                                            pathname: '/createExercise',
-                                            params: {
-                                                exId: item.exercise_id,
-                                                exName: item.name,
-                                                exDesc: item.description
-                                            }
-                                        })
-                                    }}
-                                    hitSlop={10}
-                                    style={styles.iconButton}>
-                                    <ThemedIcon name='Pencil' size={18}/>
-                                </Pressable>
+                                onPress={(e) => {
+                                    e.stopPropagation();
+                                    setModalVisible(false);
+                                    router.push({ 
+                                        pathname: '/createExercise',
+                                        params: {
+                                            exId: item.exercise_id,
+                                            exName: item.name,
+                                            exDesc: item.description
+                                        }
+                                    })
+                                }}
+                                hitSlop={10}
+                                style={styles.iconButton}>
+                                <ThemedIcon name='Pencil' size={18}/>
                             </Pressable>
-                        );
-                    }}
-                    ListEmptyComponent={
-                        <View style={styles.emptyState}>
-                            <ThemedIcon name="Dumbbell" size={48} />
-                            <ThemedText type="subtitle">No exercises found</ThemedText>
-                            <ThemedText>Create a new one to get started</ThemedText>
-                        </View>
-                    }
-                />
+                        </Pressable>
+                    );
+                }}
+                ListEmptyComponent={
+                    <View style={styles.emptyState}>
+                        <ThemedIcon name="Dumbbell" size={48} />
+                        <ThemedText type="subtitle">No exercises found</ThemedText>
+                        <ThemedText>Create a new one to get started</ThemedText>
+                    </View>
+                }
+            />
 
-                <View style={styles.footer}>
-                    <ThemedButton 
-                        style={styles.createButton}
-                        onPress={() => {
-                            setModalVisible(false);
-                        }}>
-                            <Text>Close</Text>
-                    </ThemedButton>
-                </View>
-            </ThemedView>
-        </Modal>
+            <View style={styles.footer}>
+                <ThemedButton 
+                    style={styles.createButton}
+                    onPress={() => {
+                        setModalVisible(false);
+                    }}>
+                        <Text>Close</Text>
+                </ThemedButton>
+            </View>
+        </ThemedModal>
     ) 
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-
   header: {
     flexDirection: 'row',
     alignItems: 'center',

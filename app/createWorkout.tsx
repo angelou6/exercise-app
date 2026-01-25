@@ -1,4 +1,4 @@
-import { ThemedButton, ThemedIcon, ThemedText, ThemedView } from '@/components/themed';
+import { ThemedButton, ThemedIcon, ThemedText } from '@/components/themed';
 import DragableItem from '@/components/ui/createWorkout/dragableItem';
 import AddExerciseModal from '@/components/ui/createWorkout/exercise-modal';
 import WorkoutHeader from '@/components/ui/createWorkout/header';
@@ -10,6 +10,7 @@ import { useMemo, useState } from 'react';
 import { Pressable, StyleSheet, Text, View, useColorScheme } from 'react-native';
 import DraggableFlatList, { type RenderItemParams } from 'react-native-draggable-flatlist';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const App = () => {
   const theme = useColorScheme() ?? 'light';
@@ -52,7 +53,7 @@ const App = () => {
 
   return (
     <GestureHandlerRootView style={styles.container}>
-      <ThemedView style={styles.container}>
+      <SafeAreaView style={styles.container}>
         <AddExerciseModal 
           modalVisible={modalVisible} 
           addExecise={addExercise}
@@ -115,7 +116,7 @@ const App = () => {
             <Text style={styles.saveButtonText}>Save Workout</Text>
           </ThemedButton>
         </View>
-      </ThemedView>
+      </SafeAreaView>
     </GestureHandlerRootView>
   );
 };

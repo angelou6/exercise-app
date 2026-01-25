@@ -1,8 +1,9 @@
-import { ThemedButton, ThemedIcon, ThemedInput, ThemedText, ThemedView } from '@/components/themed';
+import { ThemedButton, ThemedIcon, ThemedInput, ThemedText } from '@/components/themed';
 import { createExercise, deleteExercise, updateExercise } from '@/utils/database';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const App = () => {
   const { exId, exName, exDesc } = useLocalSearchParams();
@@ -27,7 +28,7 @@ const App = () => {
   }
 
   return (
-    <ThemedView style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <Pressable onPress={() => router.back()}>
           <ThemedIcon name='ArrowLeft' />
@@ -62,7 +63,7 @@ const App = () => {
           <ThemedText>Delete Execise</ThemedText>
         </ThemedButton>
       </View>
-    </ThemedView>
+    </SafeAreaView>
   );
 };
 

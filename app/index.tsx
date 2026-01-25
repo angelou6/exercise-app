@@ -1,9 +1,10 @@
-import { ThemedButton, ThemedIcon, ThemedText, ThemedView } from '@/components/themed';
+import { ThemedButton, ThemedIcon, ThemedText } from '@/components/themed';
 import { getAllWourkouts } from '@/utils/database';
 import { type Workout } from '@/utils/databaseTypes';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const App = () => {
   const [workouts, setWorkouts] = useState<Workout[]>([])
@@ -13,7 +14,7 @@ const App = () => {
   }, [])
 
   return (
-    <ThemedView style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <ThemedText type='title'>Exercise App</ThemedText>
         <Pressable onPress={() => router.push('/settings')}>
@@ -38,7 +39,7 @@ const App = () => {
       >
         <ThemedIcon name='Plus' />
       </ThemedButton>
-    </ThemedView>
+    </SafeAreaView>
   );
 };
 

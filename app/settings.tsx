@@ -1,14 +1,15 @@
-import { ThemedIcon, ThemedText, ThemedView } from '@/components/themed';
+import { ThemedIcon, ThemedText } from '@/components/themed';
 import RadioSelect from '@/components/ui/radio-select';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const App = () => {
   const [theme, setTheme] = useState(0);
 
   return (
-    <ThemedView>
+    <SafeAreaView>
       <View style={style.header}>
         <Pressable onPress={() => router.back()}>
           <ThemedIcon name="ArrowLeft" />
@@ -19,7 +20,7 @@ const App = () => {
         <ThemedText>Tema</ThemedText>
         <RadioSelect options={["System", "light", "dark"]} active={theme} setActive={setTheme} />
       </View>
-    </ThemedView>
+    </SafeAreaView>
   );
 };
 

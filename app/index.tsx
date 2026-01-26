@@ -37,7 +37,7 @@ const App = () => {
                   router.push({
                     pathname: "/wourkout/startWorkout",
                     params: {
-                      workoutId: item.id,
+                      workoutID: item.id,
                     },
                   })
                 }

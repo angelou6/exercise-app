@@ -5,62 +5,42 @@ import { useCardTheme } from "@/hooks/use-card-theeme";
 import { getExercisesFromWorkout } from "@/utils/database";
 import { router, useLocalSearchParams } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const App = () => {
   const db = useSQLiteContext();
-  const { wId, wRest } = useLocalSearchParams();
+  const { wID, wRest } = useLocalSearchParams();
   const cardTheme = useCardTheme();
 
-  if (!wId || !wRest) return null;
+  if (!wID || !wRest) return router.replace("/");
+
+  const restDuration = Number(wRest);
+  const exercises = useMemo(
+    () => getExercisesFromWorkout(db, Number(wID)),
+    [wID],
+  );
+
+  const [inCountdown, setInCountdown] = useState(true);
   const [exerciseIndex, setExerciseIndex] = useState(0);
-  const exercises = getExercisesFromWorkout(db, parseInt(wId.toString()));
-  const restDuration = parseInt(wRest.toString());
 
-  const name = exercises[exerciseIndex].exercise.name || "";
-  const description = exercises[exerciseIndex].exercise.description || "";
-  const duration = exercises[exerciseIndex].duration || 0;
-
-  const [SCDuration, setSCDuration] = useState(duration * 1000);
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [duration, setDuration] = useState(0);
 
   const [isExercise, setIsExercise] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
   const [timeLeft, setTimeLeft] = useState(duration);
 
-  const [inCountdown, setInCountdown] = useState(true);
-
-  useEffect(() => {
-    let interval: number | undefined = undefined;
-
-    if (isPlaying && timeLeft > 0) {
-      interval = setInterval(() => {
-        setTimeLeft((time) => time - 1);
-      }, 1000);
-    } else if (!isPlaying) {
-      clearInterval(interval);
-    } else if (timeLeft <= 0) {
-      clearInterval(interval);
-      if (isExercise) {
-        handleExerciseFinished();
-      } else {
-        handleRestFinished();
-      }
-    }
-
-    return () => clearInterval(interval);
-  }, [isPlaying, timeLeft, isExercise]);
-
   const handleExerciseFinished = () => {
     if (exerciseIndex + 1 < exercises.length) {
       setIsExercise(false);
       setTimeLeft(restDuration);
-      setSCDuration(restDuration * 1000);
     } else {
       router.replace({
         pathname: "/wourkout/finishedWorkout",
-        params: { wId },
+        params: { wID },
       });
     }
   };
@@ -69,7 +49,6 @@ const App = () => {
     const nextIndex = exerciseIndex + (direction === "next" ? 1 : -1);
     setExerciseIndex(nextIndex);
     setTimeLeft(exercises[nextIndex].duration);
-    setSCDuration(exercises[nextIndex].duration * 1000);
     setIsExercise(true);
   };
 
@@ -90,6 +69,36 @@ const App = () => {
       changeExercise("next");
     }
   };
+
+  const handleFinished = () => {
+    if (isExercise) {
+      handleExerciseFinished();
+    } else {
+      handleRestFinished();
+    }
+  };
+
+  useEffect(() => {
+    const currentExercise = exercises[exerciseIndex];
+    setName(currentExercise.exercise.name);
+    setDescription(currentExercise.exercise.description);
+    setDuration(currentExercise.duration);
+    setTimeLeft(currentExercise.duration);
+  }, [exerciseIndex]);
+
+  useEffect(() => {
+    if (!isPlaying) {
+      return;
+    }
+
+    let interval = setInterval(() => {
+      setTimeLeft((time) => time - 1);
+      if (timeLeft <= 1) {
+        handleFinished();
+      }
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [isPlaying, timeLeft, isExercise]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -128,7 +137,7 @@ const App = () => {
 
         <View style={styles.progressContainer}>
           <ProgressBar
-            duration={SCDuration}
+            duration={(isExercise ? duration : restDuration) * 1000}
             isPlaying={isPlaying}
             resetKey={`${exerciseIndex}${isExercise}`}
           />

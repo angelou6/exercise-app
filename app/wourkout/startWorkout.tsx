@@ -20,26 +20,26 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 const App = () => {
   const db = useSQLiteContext();
-  const { workoutId } = useLocalSearchParams();
+  const { workoutID } = useLocalSearchParams();
   const cardTheme = useCardTheme();
 
   const [workout, setWorkout] = useState(
-    getOneWorkout(db, workoutId.toString()),
+    getOneWorkout(db, workoutID.toString()),
   );
   const [exercises, setExercises] = useState(
-    getExercisesFromWorkout(db, parseInt(workoutId.toString())),
+    getExercisesFromWorkout(db, parseInt(workoutID.toString())),
   );
 
   useFocusEffect(
     useCallback(() => {
-      const updatedWorkout = getOneWorkout(db, workoutId.toString());
+      const updatedWorkout = getOneWorkout(db, workoutID.toString());
       const updatedExercises = getExercisesFromWorkout(
         db,
-        parseInt(workoutId.toString()),
+        parseInt(workoutID.toString()),
       );
       setWorkout(updatedWorkout);
       setExercises(updatedExercises);
-    }, [workoutId]),
+    }, [workoutID]),
   );
 
   if (!workout) return null;
@@ -57,7 +57,7 @@ const App = () => {
           text: "Delete",
           style: "destructive",
           onPress: () => {
-            deleteWorkout(db, parseInt(workoutId.toString()));
+            deleteWorkout(db, parseInt(workoutID.toString()));
             router.push("/");
           },
         },
@@ -69,7 +69,7 @@ const App = () => {
     router.push({
       pathname: "/wourkout/createWorkout",
       params: {
-        wId: workoutId,
+        wID: workoutID,
         wEmoji: workout.emoji,
         wName: workout.name,
         wRest: workout.rest,
@@ -81,7 +81,7 @@ const App = () => {
     router.push({
       pathname: "/wourkout/workout",
       params: {
-        wId: workoutId,
+        wID: workoutID,
         wRest: workout.rest,
       },
     });

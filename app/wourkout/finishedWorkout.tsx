@@ -15,7 +15,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 const App = () => {
   const db = useSQLiteContext();
-  const { wId } = useLocalSearchParams();
+  const { wID } = useLocalSearchParams();
 
   const theme = useColorScheme() ?? "light";
   const cardTheme = useMemo(
@@ -23,9 +23,9 @@ const App = () => {
     [theme],
   );
 
-  const workout = wId ? getOneWorkout(db, wId.toString()) : undefined;
-  const exercises = wId
-    ? getExercisesFromWorkout(db, parseInt(wId.toString()))
+  const workout = wID ? getOneWorkout(db, wID.toString()) : undefined;
+  const exercises = wID
+    ? getExercisesFromWorkout(db, parseInt(wID.toString()))
     : [];
 
   const totalDuration = exercises.reduce((sum, ex) => sum + ex.duration, 0);
@@ -42,7 +42,7 @@ const App = () => {
     router.replace({
       pathname: "/wourkout/workout",
       params: {
-        wId: workout.id.toString(),
+        wID: workout.id.toString(),
         wRest: workout.rest.toString(),
       },
     });

@@ -28,11 +28,11 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 const App = () => {
   const db = useSQLiteContext();
-  const { wId, wEmoji, wName, wRest } = useLocalSearchParams();
+  const { wID, wEmoji, wName, wRest } = useLocalSearchParams();
   const cardTheme = useCardTheme();
 
   const defaultDuration = 30;
-  const isEdit = !!wId;
+  const isEdit = !!wID;
 
   const [modalVisible, setModalVisible] = useState(false);
   const [exercises, setExercises] = useState<SubmitExercise[]>([]);
@@ -42,17 +42,17 @@ const App = () => {
   const [restTime, setRestTime] = useState(wRest?.toString() || "5");
 
   useEffect(() => {
-    if (wId) {
+    if (wID) {
       const loadedExercises = getExercisesFromWorkout(
         db,
-        parseInt(wId.toString()),
+        parseInt(wID.toString()),
       );
       const sortedExercises = [...loadedExercises].sort(
         (a, b) => a.order - b.order,
       );
       setExercises(sortedExercises);
     }
-  }, [wId, db]);
+  }, [wID, db]);
 
   const addExercise = (newEx: Exercise, duration = defaultDuration) => {
     for (const ex of exercises) if (ex.exercise.id === newEx.id) return;
@@ -78,7 +78,7 @@ const App = () => {
     if (!name.trim()) return;
     updateWorkout(
       db,
-      parseInt(wId.toString()),
+      parseInt(wID.toString()),
       emoji,
       name,
       parseInt(restTime),

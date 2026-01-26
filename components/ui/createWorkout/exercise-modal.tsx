@@ -23,7 +23,7 @@ type exerciseSelect = {
   modalVisible: boolean;
   setModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
   addExecise: (newEx: Exercise) => void;
-  removeExercise: (exId: number) => void;
+  removeExercise: (exID: number) => void;
   selected: SubmitExercise[];
 };
 
@@ -55,9 +55,9 @@ export default function AddExerciseModal({
       const rows = getAllExercises(db);
       setExercises(rows);
 
-      const currentIds = new Set(rows.map((r) => r.id));
+      const currentIDs = new Set(rows.map((r) => r.id));
       for (const ex of selected) {
-        if (!currentIds.has(ex.exercise.id)) {
+        if (!currentIDs.has(ex.exercise.id)) {
           removeExercise(ex.exercise.id);
         }
       }
@@ -83,7 +83,12 @@ export default function AddExerciseModal({
     >
       <View style={styles.header}>
         <ThemedText type="title">Select Exercises</ThemedText>
-        <Pressable onPress={() => router.push("/createExercise")}>
+        <Pressable
+          onPress={() => {
+            setModalVisible(false);
+            router.push("/createExercise");
+          }}
+        >
           <ThemedIcon name="Plus" />
         </Pressable>
       </View>
@@ -138,7 +143,7 @@ export default function AddExerciseModal({
                   router.push({
                     pathname: "/createExercise",
                     params: {
-                      exId: item.id,
+                      exID: item.id,
                       exName: item.name,
                       exDesc: item.description,
                     },

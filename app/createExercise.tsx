@@ -11,26 +11,33 @@ import {
 } from "@/utils/database";
 import { router, useLocalSearchParams } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const App = () => {
   const db = useSQLiteContext();
-  const { exId, exName, exDesc } = useLocalSearchParams();
+  const { exID, exName, exDesc } = useLocalSearchParams();
 
-  const [name, setName] = useState(exName?.toString() || "");
-  const [desc, setDesc] = useState(exDesc?.toString() || "");
-  const [isEdit, _] = useState(!!exId);
+  const [name, setName] = useState("");
+  const [desc, setDesc] = useState("");
+  const isEdit = !!exID;
+
+  useEffect(() => {
+    if (isEdit) {
+      setName(String(exName));
+      setDesc(String(exDesc));
+    }
+  }, [isEdit, db]);
 
   const handleSubmit = () => {
     if (!isEdit) {
       createExercise(db, name, desc);
     } else {
-      if (!exId) return;
+      if (!exID) return;
       updateExercise(
         db,
-        parseInt(Array.isArray(exId) ? exId[0] : exId),
+        parseInt(Array.isArray(exID) ? exID[0] : exID),
         name,
         desc,
       );
@@ -39,7 +46,7 @@ const App = () => {
   };
 
   const handleDelete = () => {
-    deleteExercise(db, parseInt(Array.isArray(exId) ? exId[0] : exId));
+    deleteExercise(db, parseInt(Array.isArray(exID) ? exID[0] : exID));
     router.back();
   };
 

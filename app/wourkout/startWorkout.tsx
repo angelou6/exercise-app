@@ -1,69 +1,89 @@
-import { ThemedButton, ThemedIcon, ThemedText } from '@/components/themed';
-import { CardColor } from '@/constants/theme';
-import { deleteWorkout, getExercisesFromWorkout, getOneWorkout } from '@/utils/database';
-import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
-import { useSQLiteContext } from 'expo-sqlite';
-import { useCallback, useMemo, useState } from 'react';
-import { Alert, Pressable, ScrollView, StyleSheet, Text, View, useColorScheme } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { ThemedButton, ThemedIcon, ThemedText } from "@/components/themed";
+import { useCardTheme } from "@/hooks/use-card-theeme";
+import {
+  deleteWorkout,
+  getExercisesFromWorkout,
+  getOneWorkout,
+} from "@/utils/database";
+import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
+import { useSQLiteContext } from "expo-sqlite";
+import { useCallback, useState } from "react";
+import {
+  Alert,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const App = () => {
   const db = useSQLiteContext();
-
   const { workoutId } = useLocalSearchParams();
-  const theme = useColorScheme() ?? 'light';
-  const cardTheme = useMemo(() => theme === "light" ? CardColor.light : CardColor.dark, [theme]);
+  const cardTheme = useCardTheme();
 
-  const [workout, setWorkout] = useState(getOneWorkout(db, workoutId.toString()));
-  const [exercises, setExercises] = useState(getExercisesFromWorkout(db, parseInt(workoutId.toString())));
+  const [workout, setWorkout] = useState(
+    getOneWorkout(db, workoutId.toString()),
+  );
+  const [exercises, setExercises] = useState(
+    getExercisesFromWorkout(db, parseInt(workoutId.toString())),
+  );
 
   useFocusEffect(
     useCallback(() => {
       const updatedWorkout = getOneWorkout(db, workoutId.toString());
-      const updatedExercises = getExercisesFromWorkout(db, parseInt(workoutId.toString()));
+      const updatedExercises = getExercisesFromWorkout(
+        db,
+        parseInt(workoutId.toString()),
+      );
       setWorkout(updatedWorkout);
       setExercises(updatedExercises);
-    }, [workoutId])
+    }, [workoutId]),
   );
 
   if (!workout) return null;
 
   const totalDuration = exercises.reduce((sum, ex) => sum + ex.duration, 0);
-  const totalTime = totalDuration + (exercises.length - 1) * workout.rest
-  
+  const totalTime = totalDuration + (exercises.length - 1) * workout.rest;
+
   const handleDelete = () => {
     Alert.alert(
       "Delete Workout",
       `Are you sure you want to delete "${workout?.name}"?`,
       [
         { text: "Cancel", style: "cancel" },
-        { text: "Delete", style: "destructive", onPress: () => {
-          deleteWorkout(db, parseInt(workoutId.toString()))
-          router.push('/');
-        }}
-      ]
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: () => {
+            deleteWorkout(db, parseInt(workoutId.toString()));
+            router.push("/");
+          },
+        },
+      ],
     );
   };
-  
+
   const handleEdit = () => {
     router.push({
-      pathname: '/wourkout/createWorkout',
+      pathname: "/wourkout/createWorkout",
       params: {
         wId: workoutId,
         wEmoji: workout.emoji,
         wName: workout.name,
-        wRest: workout.rest
-      }
+        wRest: workout.rest,
+      },
     });
   };
-  
+
   const handleStart = () => {
     router.push({
-      pathname: '/wourkout/workout',
+      pathname: "/wourkout/workout",
       params: {
         wId: workoutId,
-        wRest: workout.rest
-      }
+        wRest: workout.rest,
+      },
     });
   };
 
@@ -84,7 +104,15 @@ const App = () => {
       </View>
 
       <ScrollView style={styles.content}>
-        <View style={[styles.workoutCard, { backgroundColor: cardTheme.background, borderColor: cardTheme.border }]}>
+        <View
+          style={[
+            styles.workoutCard,
+            {
+              backgroundColor: cardTheme.background,
+              borderColor: cardTheme.border,
+            },
+          ]}
+        >
           <View style={styles.workoutHeader}>
             <Text style={styles.emoji}>{workout.emoji}</Text>
             <View style={styles.workoutInfo}>
@@ -93,7 +121,8 @@ const App = () => {
                 <View style={styles.stat}>
                   <ThemedIcon name="Timer" size={16} variant="dimmed" />
                   <ThemedText type="dimmed" style={styles.statText}>
-                    {Math.floor(totalTime / 60)}:{(totalTime % 60).toString().padStart(2, '0')} total
+                    {Math.floor(totalTime / 60)}:
+                    {(totalTime % 60).toString().padStart(2, "0")} total
                   </ThemedText>
                 </View>
                 <View style={styles.stat}>
@@ -102,63 +131,74 @@ const App = () => {
                     {exercises.length} exercises
                   </ThemedText>
                 </View>
+              </View>
+            </View>
+          </View>
+
+          <View
+            style={[styles.restInfo, { backgroundColor: cardTheme.border }]}
+          >
+            <ThemedIcon name="Clock" size={16} variant="dimmed" />
+            <ThemedText type="dimmed" style={styles.restText}>
+              {workout.rest}s rest between exercises
+            </ThemedText>
+          </View>
+        </View>
+        <View style={styles.section}>
+          {exercises.map((exercise) => (
+            <View
+              key={exercise.exercise.id}
+              style={[
+                styles.exerciseCard,
+                {
+                  backgroundColor: cardTheme.background,
+                  borderColor: cardTheme.border,
+                },
+              ]}
+            >
+              <View style={styles.exerciseInfo}>
+                <ThemedText type="defaultSemiBold">
+                  {exercise.exercise.name}
+                </ThemedText>
+                <View style={styles.exerciseMeta}>
+                  <ThemedIcon name="Timer" size={14} variant="dimmed" />
+                  <ThemedText type="dimmed" style={styles.durationText}>
+                    {exercise.duration}s
+                  </ThemedText>
                 </View>
               </View>
             </View>
-
-            <View style={[styles.restInfo, { backgroundColor: cardTheme.border }]}>
-              <ThemedIcon name="Clock" size={16} variant="dimmed" />
-              <ThemedText type="dimmed" style={styles.restText}>
-                {workout.rest}s rest between exercises
-              </ThemedText>
-            </View>
+          ))}
         </View>
-        <View style={styles.section}>
-            {exercises.map((exercise) => (
-              <View 
-                key={exercise.exercise.id} 
-                style={[styles.exerciseCard, { backgroundColor: cardTheme.background, borderColor: cardTheme.border }]}>
-                  <View style={styles.exerciseInfo}>
-                    <ThemedText type="defaultSemiBold">{exercise.exercise.name}</ThemedText>
-                    <View style={styles.exerciseMeta}>
-                      <ThemedIcon name="Timer" size={14} variant="dimmed" />
-                      <ThemedText type="dimmed" style={styles.durationText}>
-                        {exercise.duration}s
-                      </ThemedText>
-                    </View>
-                  </View>
-              </View>
-            ))}
-          </View>
       </ScrollView>
-        <View style={styles.footer}>
-          <ThemedButton onPress={handleStart} style={styles.startButton}>
-              <ThemedIcon name="Play" size={24} />
-              <Text>Start Workout</Text>
-          </ThemedButton>
-        </View>
+      <View style={styles.footer}>
+        <ThemedButton onPress={handleStart} style={styles.startButton}>
+          <ThemedIcon name="Play" size={24} />
+          <Text>Start Workout</Text>
+        </ThemedButton>
+      </View>
     </SafeAreaView>
   );
 };
-  
+
 const styles = StyleSheet.create({
   container: {
-    flex: 1
+    flex: 1,
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingHorizontal: 20,
     paddingVertical: 15,
   },
   backButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 4,
   },
   headerActions: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 15,
   },
   iconButton: {
@@ -174,8 +214,8 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   workoutHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 16,
     marginBottom: 16,
   },
@@ -187,20 +227,20 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   statsRow: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 20,
   },
   stat: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 6,
   },
   statText: {
     fontSize: 13,
   },
   restInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 8,
     padding: 12,
     borderRadius: 8,
@@ -213,8 +253,8 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   exerciseCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     borderWidth: 1,
     borderRadius: 12,
     padding: 16,
@@ -226,8 +266,8 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   exerciseMeta: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 4,
   },
   durationText: {
@@ -240,13 +280,13 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   startButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     gap: 12,
     padding: 18,
     borderRadius: 16,
   },
 });
-  
+
 export default App;

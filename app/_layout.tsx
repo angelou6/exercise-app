@@ -1,20 +1,25 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { Stack } from 'expo-router';
-import { SQLiteProvider, type SQLiteDatabase } from 'expo-sqlite';
-import { StatusBar } from 'expo-status-bar';
-import * as SystemUI from 'expo-system-ui';
+import {
+  DarkTheme,
+  DefaultTheme,
+  ThemeProvider,
+} from "@react-navigation/native";
+import { Stack } from "expo-router";
+import { SQLiteProvider, type SQLiteDatabase } from "expo-sqlite";
+import { StatusBar } from "expo-status-bar";
+import * as SystemUI from "expo-system-ui";
 
-import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { Colors } from "@/constants/theme";
+import { useColorScheme } from "@/hooks/use-color-scheme";
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
-  const bgColor = colorScheme === 'dark' ? Colors.dark.background : Colors.light.background;
+  const bgColor =
+    colorScheme === "dark" ? Colors.dark.background : Colors.light.background;
   SystemUI.setBackgroundColorAsync(bgColor);
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <SQLiteProvider databaseName='exercise.db' onInit={migration}>
+    <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+      <SQLiteProvider databaseName="exercise.db" onInit={migration}>
         <StatusBar style="auto" />
         <Stack screenOptions={{ headerShown: false }} />
       </SQLiteProvider>
@@ -23,8 +28,8 @@ export default function RootLayout() {
 }
 
 async function migration(db: SQLiteDatabase) {
-  const RESET_DB = false; 
-  
+  const RESET_DB = false;
+
   if (RESET_DB) {
     await db.execAsync(`
       DROP TABLE IF EXISTS Workout_Exercises;
@@ -36,7 +41,7 @@ async function migration(db: SQLiteDatabase) {
   const DATABASE_VERSION = 1;
 
   let result = await db.getFirstAsync<{ user_version: number }>(
-    'PRAGMA user_version'
+    "PRAGMA user_version",
   );
   let currentDbVersion = result?.user_version ?? 0;
   if (currentDbVersion >= DATABASE_VERSION) return;

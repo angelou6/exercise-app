@@ -1,24 +1,28 @@
-import React, { useEffect } from 'react';
-import { StyleSheet, View } from 'react-native';
+import React, { useEffect } from "react";
+import { StyleSheet, View } from "react-native";
 import Animated, {
   cancelAnimation,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
-} from 'react-native-reanimated';
+} from "react-native-reanimated";
 
 type ProgressBar = {
-  duration: number,
-  isPlaying: boolean,
-  resetKey: string | number,
-}
+  duration: number;
+  isPlaying: boolean;
+  resetKey: string | number;
+};
 
-export default function ShrinkingProgressBar({ duration, isPlaying, resetKey }: ProgressBar) {
+export default function ShrinkingProgressBar({
+  duration,
+  isPlaying,
+  resetKey,
+}: ProgressBar) {
   const progress = useSharedValue(1);
 
   useEffect(() => {
     progress.value = 1;
-  }, [resetKey])
+  }, [resetKey]);
 
   useEffect(() => {
     if (!isPlaying) {
@@ -46,13 +50,13 @@ export default function ShrinkingProgressBar({ duration, isPlaying, resetKey }: 
 const styles = StyleSheet.create({
   container: {
     height: 10,
-    width: '100%',
-    backgroundColor: '#e0e0e0',
+    width: "100%",
+    backgroundColor: "#e0e0e0",
     borderRadius: 5,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   bar: {
-    height: '100%',
-    backgroundColor: '#ff5252',
+    height: "100%",
+    backgroundColor: "#ff5252",
   },
 });

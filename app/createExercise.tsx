@@ -1,67 +1,83 @@
-import { ThemedButton, ThemedIcon, ThemedInput, ThemedText } from '@/components/themed';
-import { createExercise, deleteExercise, updateExercise } from '@/utils/database';
-import { router, useLocalSearchParams } from 'expo-router';
-import { useSQLiteContext } from 'expo-sqlite';
-import React, { useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import {
+  ThemedButton,
+  ThemedIcon,
+  ThemedInput,
+  ThemedText,
+} from "@/components/themed";
+import {
+  createExercise,
+  deleteExercise,
+  updateExercise,
+} from "@/utils/database";
+import { router, useLocalSearchParams } from "expo-router";
+import { useSQLiteContext } from "expo-sqlite";
+import React, { useState } from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const App = () => {
   const db = useSQLiteContext();
   const { exId, exName, exDesc } = useLocalSearchParams();
 
-  const [name, setName] = useState(exName?.toString() || '');
-  const [desc, setDesc] = useState(exDesc?.toString() || '');
+  const [name, setName] = useState(exName?.toString() || "");
+  const [desc, setDesc] = useState(exDesc?.toString() || "");
   const [isEdit, _] = useState(!!exId);
 
   const handleSubmit = () => {
     if (!isEdit) {
-      createExercise(db, name, desc)
+      createExercise(db, name, desc);
     } else {
       if (!exId) return;
-      updateExercise(db, parseInt(Array.isArray(exId) ? exId[0] : exId), name, desc);
+      updateExercise(
+        db,
+        parseInt(Array.isArray(exId) ? exId[0] : exId),
+        name,
+        desc,
+      );
     }
-    router.back()
-  }
+    router.back();
+  };
 
   const handleDelete = () => {
     deleteExercise(db, parseInt(Array.isArray(exId) ? exId[0] : exId));
-    router.back()
-  }
+    router.back();
+  };
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <Pressable onPress={() => router.back()}>
-          <ThemedIcon name='ArrowLeft' />
+          <ThemedIcon name="ArrowLeft" />
         </Pressable>
-        <ThemedText type='title'>Create Exercise</ThemedText>
+        <ThemedText type="title">Create Exercise</ThemedText>
       </View>
       <View style={styles.form}>
         <View style={styles.formGroup}>
           <ThemedText style={styles.label}>Exercise Name</ThemedText>
-          <ThemedInput 
+          <ThemedInput
             value={name}
             onChangeText={setName}
-            style={styles.input} 
-            placeholder='Enter exercise name'/>
+            style={styles.input}
+            placeholder="Enter exercise name"
+          />
         </View>
         <View style={styles.formGroup}>
           <ThemedText style={styles.label}>Description</ThemedText>
-          <ThemedInput 
+          <ThemedInput
             value={desc}
             onChangeText={setDesc}
-            style={[styles.input, styles.textArea]} 
-            placeholder='Enter exercise description' 
-            multiline 
+            style={[styles.input, styles.textArea]}
+            placeholder="Enter exercise description"
+            multiline
           />
         </View>
-        <ThemedButton 
-          onPress={() => handleSubmit()} 
-        >
+        <ThemedButton onPress={() => handleSubmit()}>
           <Text>{isEdit ? "Update Exercise" : "Add Exercise"}</Text>
         </ThemedButton>
-        <ThemedButton onPress={() => handleDelete()} style={styles.deleteButton}>
+        <ThemedButton
+          onPress={() => handleDelete()}
+          style={styles.deleteButton}
+        >
           <ThemedText>Delete Execise</ThemedText>
         </ThemedButton>
       </View>
@@ -74,8 +90,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: 20,
     paddingVertical: 15,
     marginBottom: 20,
@@ -90,7 +106,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
     marginLeft: 4,
   },
   input: {
@@ -98,16 +114,16 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: "#ddd",
   },
   textArea: {
     minHeight: 100,
     paddingTop: 12,
-    textAlignVertical: 'top',
+    textAlignVertical: "top",
   },
   deleteButton: {
-    backgroundColor: 'transparent',
-  }
-})
+    backgroundColor: "transparent",
+  },
+});
 
 export default App;

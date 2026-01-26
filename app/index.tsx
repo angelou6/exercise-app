@@ -1,65 +1,71 @@
-import { ThemedButton, ThemedIcon, ThemedText } from '@/components/themed';
-import { CardColor } from '@/constants/theme';
-import { getAllWourkouts } from '@/utils/database';
-import { type Workout } from '@/utils/databaseTypes';
-import { router, useFocusEffect } from 'expo-router';
-import { useSQLiteContext } from 'expo-sqlite';
-import React, { useCallback, useMemo, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View, useColorScheme } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { ThemedButton, ThemedIcon, ThemedText } from "@/components/themed";
+import { useCardTheme } from "@/hooks/use-card-theeme";
+import { getAllWourkouts } from "@/utils/database";
+import { type Workout } from "@/utils/databaseTypes";
+import { router, useFocusEffect } from "expo-router";
+import { useSQLiteContext } from "expo-sqlite";
+import React, { useCallback, useState } from "react";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const App = () => {
   const db = useSQLiteContext();
-  const [workouts, setWorkouts] = useState<Workout[]>([])
-  const theme = useColorScheme() ?? 'light';
-  const cardTheme = useMemo(() => theme === "light" ? CardColor.light : CardColor.dark, [theme]);
+  const [workouts, setWorkouts] = useState<Workout[]>([]);
+  const cardTheme = useCardTheme();
 
   useFocusEffect(
     useCallback(() => {
-      setWorkouts(getAllWourkouts(db))
-    }, [db])
-  )
+      setWorkouts(getAllWourkouts(db));
+    }, [db]),
+  );
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <ThemedText type='title'>Exercise App</ThemedText>
-        <Pressable onPress={() => router.push('/settings')}>
-          <ThemedIcon name='Settings' size={24} />
+        <ThemedText type="title">Exercise App</ThemedText>
+        <Pressable onPress={() => router.push("/settings")}>
+          <ThemedIcon name="Settings" size={24} />
         </Pressable>
       </View>
       <ScrollView style={styles.content}>
         <View style={styles.section}>
-          {workouts.length > 0 ? workouts.map((item) => (
-            <Pressable 
-              key={item.id}
-              onPress={() => router.push({
-                pathname: '/wourkout/startWorkout',
-                params: {
-                  workoutId: item.id
+          {workouts.length > 0 ? (
+            workouts.map((item) => (
+              <Pressable
+                key={item.id}
+                onPress={() =>
+                  router.push({
+                    pathname: "/wourkout/startWorkout",
+                    params: {
+                      workoutId: item.id,
+                    },
+                  })
                 }
-              })}
-            >
-              <View 
-                style={[
-                  styles.workoutCard, 
-                  { 
-                    backgroundColor: cardTheme.background, 
-                    borderColor: cardTheme.border 
-                  }
-                ]}
               >
-                <View style={styles.workoutContent}>
-                  <Text style={styles.emoji}>{item.emoji}</Text>
-                  <View style={styles.workoutInfo}>
-                    <ThemedText type="defaultSemiBold" style={styles.workoutName}>
-                      {item.name}
-                    </ThemedText>
+                <View
+                  style={[
+                    styles.workoutCard,
+                    {
+                      backgroundColor: cardTheme.background,
+                      borderColor: cardTheme.border,
+                    },
+                  ]}
+                >
+                  <View style={styles.workoutContent}>
+                    <Text style={styles.emoji}>{item.emoji}</Text>
+                    <View style={styles.workoutInfo}>
+                      <ThemedText
+                        type="defaultSemiBold"
+                        style={styles.workoutName}
+                      >
+                        {item.name}
+                      </ThemedText>
+                    </View>
                   </View>
                 </View>
-              </View>
-            </Pressable>
-          )) : (
+              </Pressable>
+            ))
+          ) : (
             <View style={styles.emptyContainer}>
               <View style={styles.emptyCard}>
                 <ThemedIcon name="Dumbbell" size={48} variant="dimmed" />
@@ -70,11 +76,11 @@ const App = () => {
         </View>
       </ScrollView>
       <View style={styles.footer}>
-        <ThemedButton 
-          onPress={() => router.push('/wourkout/createWorkout')} 
+        <ThemedButton
+          onPress={() => router.push("/wourkout/createWorkout")}
           style={styles.addButton}
         >
-          <ThemedIcon name='Plus' size={24} />
+          <ThemedIcon name="Plus" size={24} />
           <Text>Create Workout</Text>
         </ThemedButton>
       </View>
@@ -84,13 +90,13 @@ const App = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1
+    flex: 1,
   },
 
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingHorizontal: 20,
     paddingVertical: 15,
   },
@@ -104,8 +110,8 @@ const styles = StyleSheet.create({
   },
 
   workoutCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     borderWidth: 1,
     borderRadius: 12,
     padding: 16,
@@ -115,8 +121,8 @@ const styles = StyleSheet.create({
 
   workoutContent: {
     flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 16,
   },
 
@@ -135,20 +141,20 @@ const styles = StyleSheet.create({
 
   emptyContainer: {
     marginTop: 40,
-    alignItems: 'center',
+    alignItems: "center",
   },
 
   emptyCard: {
-    width: '100%',
+    width: "100%",
     padding: 32,
     borderRadius: 16,
     borderWidth: 1,
-    alignItems: 'center',
+    alignItems: "center",
     gap: 12,
   },
 
   emptySubtext: {
-    textAlign: 'center',
+    textAlign: "center",
   },
 
   restText: {
@@ -160,13 +166,13 @@ const styles = StyleSheet.create({
   },
 
   addButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     gap: 12,
     padding: 18,
     borderRadius: 16,
-  }
-})
+  },
+});
 
 export default App;

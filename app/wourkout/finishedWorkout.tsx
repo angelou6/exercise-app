@@ -1,9 +1,11 @@
 import { ThemedButton, ThemedIcon, ThemedText } from "@/components/themed";
 import { CardColor } from "@/constants/theme";
 import { getExercisesFromWorkout, getOneWorkout } from "@/utils/database";
+import { getTodayString, getYesterdayString } from "@/utils/streakUtils";
 import { router, useLocalSearchParams } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
-import { useMemo } from "react";
+import { Storage } from "expo-sqlite/kv-store";
+import { useEffect, useMemo } from "react";
 import {
   Pressable,
   StyleSheet,
@@ -17,15 +19,36 @@ const App = () => {
   const db = useSQLiteContext();
   const { wID } = useLocalSearchParams();
 
+  useEffect(() => {
+    const activeStreak = Storage.getItemSync("useStreak");
+    if (!activeStreak) return;
+
+    const todayStr = getTodayString();
+    const lastDayExercised = Storage.getItemSync("lastDayExercised");
+
+    if (lastDayExercised === todayStr) return;
+
+    const yesterdayStr = getYesterdayString();
+    const currentStreak = Number(Storage.getItemSync("streak")) || 0;
+
+    if (lastDayExercised === yesterdayStr) {
+      Storage.setItemSync("streak", String(currentStreak + 1));
+    } else {
+      Storage.setItemSync("streak", "1");
+    }
+
+    Storage.setItemSync("lastDayExercised", todayStr);
+  }, []);
+
   const theme = useColorScheme() ?? "light";
   const cardTheme = useMemo(
     () => (theme === "light" ? CardColor.light : CardColor.dark),
     [theme],
   );
 
-  const workout = wID ? getOneWorkout(db, wID.toString()) : undefined;
+  const workout = wID ? getOneWorkout(db, String(wID)) : undefined;
   const exercises = wID
-    ? getExercisesFromWorkout(db, parseInt(wID.toString()))
+    ? getExercisesFromWorkout(db, parseInt(String(wID)))
     : [];
 
   const totalDuration = exercises.reduce((sum, ex) => sum + ex.duration, 0);

@@ -66,14 +66,14 @@ export default function WorkoutHeader({
           >
             <Text style={styles.emoji}>{emoji}</Text>
           </Pressable>
-          <View>
-            <ThemedInput
-              value={name}
-              onChangeText={setName}
-              style={styles.workoutName}
-              placeholder="Workout Name"
-            />
-          </View>
+          <ThemedInput
+            value={name}
+            multiline
+            scrollEnabled={true}
+            onChangeText={setName}
+            style={styles.workoutName}
+            placeholder="Workout Name"
+          />
         </View>
 
         <View style={styles.restRow}>
@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
   },
   workoutName: {
     fontSize: 18,
-    width: 1000,
+    width: "80%",
     fontWeight: "bold",
   },
   restRow: {

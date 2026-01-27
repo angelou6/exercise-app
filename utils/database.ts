@@ -2,10 +2,11 @@ import { type SQLiteDatabase } from "expo-sqlite";
 import { Exercise, SubmitExercise, Workout } from "./databaseTypes";
 
 export function createExercise(db: SQLiteDatabase, name: string, desc: string) {
-  db.runSync(
+  const result = db.runSync(
     "INSERT INTO exercises (name, description) VALUES ($name, $description)",
     { $name: name, $description: desc },
   );
+  return result.lastInsertRowId;
 }
 
 export function getAllExercises(db: SQLiteDatabase): Exercise[] {

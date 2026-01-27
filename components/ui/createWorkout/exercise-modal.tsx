@@ -7,7 +7,7 @@ import {
 import { CardColor, Colors } from "@/constants/theme";
 import { getAllExercises } from "@/utils/database";
 import { SubmitExercise, type Exercise } from "@/utils/databaseTypes";
-import { router, useFocusEffect } from "expo-router";
+import { useFocusEffect } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
 import React, { useCallback, useMemo, useState } from "react";
 import {
@@ -18,6 +18,7 @@ import {
   useColorScheme,
   View,
 } from "react-native";
+import CreateExerciseModal from "./create-exercise-modal";
 
 type exerciseSelect = {
   modalVisible: boolean;
@@ -38,6 +39,9 @@ export default function AddExerciseModal({
   const defaultIconSize = 22;
 
   const [exercises, setExercises] = useState<Exercise[]>([]);
+  const [createModalVisible, setCreateModalVisible] = useState(false);
+  const [editingExercise, setEditingExercise] = useState<Exercise | null>(null);
+
   const theme = useColorScheme() ?? "light";
   const cardTheme = useMemo(
     () => (theme === "light" ? CardColor.dark : CardColor.light),
@@ -72,6 +76,18 @@ export default function AddExerciseModal({
     }
   };
 
+  const handleExerciseChange = (newExerciseId: number | undefined | null) => {
+    const rows = getAllExercises(db);
+    setExercises(rows);
+
+    if (newExerciseId) {
+      const newEx = rows.find((ex) => ex.id === newExerciseId);
+      if (newEx) {
+        addExecise(newEx);
+      }
+    }
+  };
+
   return (
     <ThemedModal
       animationType="slide"
@@ -81,12 +97,18 @@ export default function AddExerciseModal({
         setModalVisible(!modalVisible);
       }}
     >
+      <CreateExerciseModal
+        visible={createModalVisible}
+        onClose={() => setCreateModalVisible(false)}
+        initialExercise={editingExercise}
+        onExerciseChange={handleExerciseChange}
+      />
       <View style={styles.header}>
         <ThemedText type="title">Select Exercises</ThemedText>
         <Pressable
           onPress={() => {
-            setModalVisible(false);
-            router.push("/createExercise");
+            setEditingExercise(null);
+            setCreateModalVisible(true);
           }}
         >
           <ThemedIcon name="Plus" />
@@ -139,15 +161,8 @@ export default function AddExerciseModal({
               <Pressable
                 onPress={(e) => {
                   e.stopPropagation();
-                  setModalVisible(false);
-                  router.push({
-                    pathname: "/createExercise",
-                    params: {
-                      exID: item.id,
-                      exName: item.name,
-                      exDesc: item.description,
-                    },
-                  });
+                  setEditingExercise(item);
+                  setCreateModalVisible(true);
                 }}
                 hitSlop={10}
                 style={styles.iconButton}

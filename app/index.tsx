@@ -55,7 +55,11 @@ const App = () => {
 
   useFocusEffect(
     useCallback(() => {
-      setWorkouts(getAllWourkouts(db));
+      try {
+        setWorkouts(getAllWourkouts(db));
+      } catch {
+        setWorkouts([]);
+      }
     }, [db]),
   );
 

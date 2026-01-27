@@ -4,7 +4,11 @@ import {
   ThemeProvider,
 } from "@react-navigation/native";
 import { Stack } from "expo-router";
-import { SQLiteProvider, type SQLiteDatabase } from "expo-sqlite";
+import {
+  SQLiteProvider,
+  openDatabaseSync,
+  type SQLiteDatabase,
+} from "expo-sqlite";
 import { StatusBar } from "expo-status-bar";
 import * as SystemUI from "expo-system-ui";
 
@@ -16,6 +20,8 @@ export default function RootLayout() {
   const bgColor =
     colorScheme === "dark" ? Colors.dark.background : Colors.light.background;
   SystemUI.setBackgroundColorAsync(bgColor);
+
+  openDatabaseSync("exercise.db");
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>

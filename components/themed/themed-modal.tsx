@@ -1,6 +1,6 @@
-import { Modal, ModalProps, View } from 'react-native';
-
-import { useThemeColor } from '@/hooks/use-theme-color';
+import { useThemeColor } from "@/hooks/use-theme-color";
+import { Modal, ModalProps } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export type ThemedModalProps = ModalProps & {
   children?: React.ReactNode;
@@ -8,14 +8,23 @@ export type ThemedModalProps = ModalProps & {
   darkColor?: string;
 };
 
-export function ThemedModal({ children, style, lightColor, darkColor, ...otherProps }: ThemedModalProps) {
-  const backgroundColor = useThemeColor({ light: lightColor, dark: darkColor }, 'background');
+export function ThemedModal({
+  children,
+  style,
+  lightColor,
+  darkColor,
+  ...otherProps
+}: ThemedModalProps) {
+  const backgroundColor = useThemeColor(
+    { light: lightColor, dark: darkColor },
+    "background",
+  );
 
   return (
     <Modal {...otherProps}>
-      <View style={[{ backgroundColor, flex: 1 }, style]}>
+      <SafeAreaView style={[{ backgroundColor, flex: 1 }, style]}>
         {children}
-      </View>
+      </SafeAreaView>
     </Modal>
   );
 }

@@ -1,7 +1,7 @@
-import { ThemedText } from "@/components/themed";
 import { ThemedModal } from "@/components/themed/themed-modal";
-import React, { useEffect, useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { useAudioPlayer } from "expo-audio";
+import React, { useCallback, useEffect, useState } from "react";
+import { StyleSheet, Text, View } from "react-native";
 
 type CountdownModalProps = {
   visible: boolean;
@@ -15,20 +15,39 @@ export default function CountdownModal({
   duration,
   onClose,
 }: CountdownModalProps) {
-  const [preTimeLeft, setPreTimeLeft] = useState(duration);
+  const [timeLeft, setTimeLeft] = useState(duration);
+  const clickAudio = useAudioPlayer(require("../../../assets/audio/click.mp3"));
+  const dingAudio = useAudioPlayer(require("../../../assets/audio/ding.mp3"));
+
+  useEffect(() => {
+    if (visible) {
+      setTimeLeft(duration);
+    }
+  }, [visible, duration]);
 
   useEffect(() => {
     let interval = setInterval(() => {
-      setPreTimeLeft((t) => t - 1);
+      setTimeLeft((t) => t - 1);
     }, 1000);
 
-    if (preTimeLeft <= 0) {
+    if (timeLeft <= 0) {
+      dingAudio.seekTo(0);
+      dingAudio.play();
       clearInterval(interval);
       onClose();
     }
 
     return () => clearInterval(interval);
-  }, [preTimeLeft]);
+  }, [timeLeft]);
+
+  useEffect(
+    useCallback(() => {
+      if (timeLeft < 5 && timeLeft > 0) {
+        clickAudio.seekTo(0);
+        clickAudio.play();
+      }
+    }, [timeLeft]),
+  );
 
   return (
     <ThemedModal
@@ -41,7 +60,7 @@ export default function CountdownModal({
     >
       <View style={styles.topContainer}>
         <View style={styles.row}>
-          <ThemedText style={styles.bigText}>{preTimeLeft}</ThemedText>
+          <Text style={styles.bigText}>{timeLeft}</Text>
         </View>
       </View>
     </ThemedModal>
@@ -63,6 +82,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   bigText: {
+    color: "white",
     fontWeight: "bold",
     lineHeight: 96,
     fontSize: 96,

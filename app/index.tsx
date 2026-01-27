@@ -4,10 +4,7 @@ import { useCardTheme } from "@/hooks/use-card-theeme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { getAllWourkouts } from "@/utils/database";
 import { type Workout } from "@/utils/databaseTypes";
-import {
-  getTodayString,
-  getYesterdayString
-} from "@/utils/streakUtils";
+import { getTodayString, getYesterdayString } from "@/utils/streakUtils";
 import { router, useFocusEffect } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
 import { Storage } from "expo-sqlite/kv-store";
@@ -66,25 +63,27 @@ const App = () => {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <ThemedText type="title">Exercise App</ThemedText>
-        {useStreak && (
-          <View style={styles.streakContainer}>
-            <ThemedIcon
-              name="Flame"
-              color={
-                streak > 0
-                  ? "red"
-                  : theme === "light"
-                    ? Colors.light.icon
-                    : Colors.dark.icon
-              }
-              size={24}
-            />
-            <ThemedText>{streak}</ThemedText>
-          </View>
-        )}
-        <Pressable onPress={() => router.push("/settings")}>
-          <ThemedIcon name="Settings" size={24} />
-        </Pressable>
+        <View style={styles.rightSide}>
+          {useStreak && (
+            <View style={styles.streakContainer}>
+              <ThemedIcon
+                name="Flame"
+                color={
+                  streak > 0
+                    ? "red"
+                    : theme === "light"
+                      ? Colors.light.icon
+                      : Colors.dark.icon
+                }
+                size={24}
+              />
+              <ThemedText>{streak}</ThemedText>
+            </View>
+          )}
+          <Pressable onPress={() => router.push("/settings")}>
+            <ThemedIcon name="Settings" size={24} />
+          </Pressable>
+        </View>
       </View>
       <ScrollView style={styles.content}>
         <View style={styles.section}>
@@ -158,6 +157,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 15,
   },
+  rightSide: {
+    flexDirection: "row",
+    gap: 20,
+  },
   streakContainer: {
     flexDirection: "row",
     gap: 4,
@@ -201,7 +204,6 @@ const styles = StyleSheet.create({
     width: "100%",
     padding: 32,
     borderRadius: 16,
-    borderWidth: 1,
     alignItems: "center",
     gap: 12,
   },

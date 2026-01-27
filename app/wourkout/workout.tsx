@@ -3,6 +3,7 @@ import CountdownModal from "@/components/ui/workout/countdown-modal";
 import ProgressBar from "@/components/ui/workout/progressBar";
 import { useCardTheme } from "@/hooks/use-card-theeme";
 import { getExercisesFromWorkout } from "@/utils/database";
+import { useAudioPlayer } from "expo-audio";
 import { router, useLocalSearchParams } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
 import { useEffect, useMemo, useState } from "react";
@@ -13,6 +14,9 @@ const App = () => {
   const db = useSQLiteContext();
   const { wID, wRest } = useLocalSearchParams();
   const cardTheme = useCardTheme();
+
+  const dingAudio = useAudioPlayer(require("../../assets/audio/ding.mp3"));
+  const clickAudio = useAudioPlayer(require("../../assets/audio/click.mp3"));
 
   if (!wID || !wRest) return router.replace("/");
 
@@ -42,6 +46,16 @@ const App = () => {
         pathname: "/wourkout/finishedWorkout",
         params: { wID },
       });
+    }
+  };
+
+  const handlePause = () => {
+    if (isPlaying) {
+      setIsPlaying(false);
+    } else if (isExercise) {
+      setInCountdown(true);
+    } else {
+      setIsPlaying(true);
     }
   };
 
@@ -76,6 +90,8 @@ const App = () => {
     } else {
       handleRestFinished();
     }
+    dingAudio.seekTo(0);
+    dingAudio.play();
   };
 
   useEffect(() => {
@@ -99,6 +115,13 @@ const App = () => {
     }, 1000);
     return () => clearInterval(interval);
   }, [isPlaying, timeLeft, isExercise]);
+
+  useEffect(() => {
+    if (timeLeft <= 5 && timeLeft > 0) {
+      clickAudio.seekTo(0);
+      clickAudio.play();
+    }
+  }, [timeLeft]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -155,10 +178,7 @@ const App = () => {
             <ThemedIcon name="SkipBack" size={32} />
           </Pressable>
 
-          <Pressable
-            onPress={() => setIsPlaying(!isPlaying)}
-            style={styles.playButton}
-          >
+          <Pressable onPress={handlePause} style={styles.playButton}>
             <View
               style={[
                 styles.playButtonInner,

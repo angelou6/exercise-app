@@ -6,14 +6,12 @@ import { getAllWourkouts } from "@/utils/database";
 import { type Workout } from "@/utils/databaseTypes";
 import { getTodayString, getYesterdayString } from "@/utils/streakUtils";
 import { router, useFocusEffect } from "expo-router";
-import { openDatabaseSync } from "expo-sqlite";
 import { Storage } from "expo-sqlite/kv-store";
 import React, { useCallback, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const App = () => {
-  const db = openDatabaseSync("exercise.db", { useNewConnection: true });
   const theme = useColorScheme() ?? "light";
 
   const cardTheme = useCardTheme();
@@ -56,11 +54,11 @@ const App = () => {
   useFocusEffect(
     useCallback(() => {
       try {
-        setWorkouts(getAllWourkouts(db));
+        setWorkouts(getAllWourkouts());
       } catch {
         setWorkouts([]);
       }
-    }, [db]),
+    }, []),
   );
 
   return (

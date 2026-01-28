@@ -9,7 +9,6 @@ import { Colors } from "@/constants/theme";
 import { getAllExercises } from "@/utils/database";
 import { SubmitExercise, type Exercise } from "@/utils/databaseTypes";
 import { useFocusEffect } from "expo-router";
-import { useSQLiteContext } from "expo-sqlite";
 import Fuse from "fuse.js";
 import React, { useCallback, useMemo, useState } from "react";
 import {
@@ -37,7 +36,6 @@ export default function AddExerciseModal({
   removeExercise,
   selected,
 }: exerciseSelect) {
-  const db = useSQLiteContext();
   const defaultIconSize = 22;
 
   const [exercises, setExercises] = useState<Exercise[]>([]);
@@ -63,7 +61,7 @@ export default function AddExerciseModal({
 
   useFocusEffect(
     useCallback(() => {
-      const rows = getAllExercises(db);
+      const rows = getAllExercises();
       setExercises(rows);
 
       const currentIDs = new Set(rows.map((r) => r.id));
@@ -72,7 +70,7 @@ export default function AddExerciseModal({
           removeExercise(ex.exercise.id);
         }
       }
-    }, [db]),
+    }, []),
   );
 
   const handleSelectExercise = (exercise: Exercise) => {
@@ -84,7 +82,7 @@ export default function AddExerciseModal({
   };
 
   const handleExerciseChange = (newExerciseId: number | undefined | null) => {
-    const rows = getAllExercises(db);
+    const rows = getAllExercises();
     setExercises(rows);
 
     if (newExerciseId) {
@@ -111,7 +109,7 @@ export default function AddExerciseModal({
       <View style={styles.header}>
         <ThemedText type="title">Select Exercises</ThemedText>
         <Pressable onPress={onClose}>
-          <ThemedIcon name="X" />
+          <ThemedIcon name="Check" />
         </Pressable>
       </View>
       <View style={styles.searchContainer}>

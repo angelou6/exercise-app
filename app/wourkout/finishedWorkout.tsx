@@ -3,7 +3,6 @@ import { getOneWorkout } from "@/utils/database";
 import { getTodayString, getYesterdayString } from "@/utils/streakUtils";
 import { useAudioPlayer } from "expo-audio";
 import { router, useLocalSearchParams } from "expo-router";
-import { openDatabaseSync } from "expo-sqlite";
 import { Storage } from "expo-sqlite/kv-store";
 import { useEffect, useMemo } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
@@ -12,11 +11,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 const partyPopperSource = require("../../assets/audio/partypopper.mp3");
 
 const App = () => {
-  const db = openDatabaseSync("exercise.db", { useNewConnection: true });
   const { wID } = useLocalSearchParams();
   const partyPopperAudio = useAudioPlayer(partyPopperSource);
 
-  const workout = useMemo(() => getOneWorkout(db, String(wID)), [db, wID]);
+  const workout = useMemo(() => getOneWorkout(String(wID)), [wID]);
 
   const handleGoHome = () => {
     router.replace("/");

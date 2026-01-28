@@ -10,7 +10,6 @@ import {
 } from "@/utils/database";
 import { type Exercise, type SubmitExercise } from "@/utils/databaseTypes";
 import { router, useLocalSearchParams } from "expo-router";
-import { openDatabaseSync } from "expo-sqlite";
 import { useEffect, useState } from "react";
 import {
   ListRenderItemInfo,
@@ -27,7 +26,6 @@ import ReorderableList, {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const App = () => {
-  const db = openDatabaseSync("exercise.db", { useNewConnection: true });
   const { wID, wEmoji, wName, wRest } = useLocalSearchParams();
   const cardTheme = useCardTheme();
 
@@ -43,16 +41,13 @@ const App = () => {
 
   useEffect(() => {
     if (wID) {
-      const loadedExercises = getExercisesFromWorkout(
-        db,
-        parseInt(wID.toString()),
-      );
+      const loadedExercises = getExercisesFromWorkout(parseInt(wID.toString()));
       const sortedExercises = [...loadedExercises].sort(
         (a, b) => a.order - b.order,
       );
       setExercises(sortedExercises);
     }
-  }, [wID, db]);
+  }, [wID]);
 
   const addExercise = (newEx: Exercise, duration = defaultDuration) => {
     for (const ex of exercises) if (ex.exercise.id === newEx.id) return;
@@ -70,15 +65,13 @@ const App = () => {
 
   const handleCreateWorkout = () => {
     if (!name.trim()) return;
-    createWorkout(db, emoji, name, parseInt(restTime), exercises);
+    createWorkout(emoji, name, parseInt(restTime), exercises);
     router.push("/");
   };
 
   const handleUpdateWorkout = () => {
-    console.log(Number(String(wID)), emoji, name, Number(restTime), exercises);
     if (!name.trim()) return;
     updateWorkout(
-      db,
       Number(String(wID)),
       emoji,
       name,

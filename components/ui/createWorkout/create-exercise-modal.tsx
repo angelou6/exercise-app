@@ -11,7 +11,6 @@ import {
   updateExercise,
 } from "@/utils/database";
 import { Exercise } from "@/utils/databaseTypes";
-import { useSQLiteContext } from "expo-sqlite";
 import React, { useEffect, useState } from "react";
 import {
   Modal,
@@ -35,7 +34,6 @@ export default function CreateExerciseModal({
   initialExercise,
   onExerciseChange,
 }: CreateExerciseModalProps) {
-  const db = useSQLiteContext();
   const backgroundColor = useThemeColor({}, "background");
 
   const [name, setName] = useState("");
@@ -55,10 +53,10 @@ export default function CreateExerciseModal({
 
   const handleSubmit = () => {
     if (!initialExercise) {
-      const newId = createExercise(db, name, desc);
+      const newId = createExercise(name, desc);
       onExerciseChange(newId);
     } else {
-      updateExercise(db, initialExercise.id, name, desc);
+      updateExercise(initialExercise.id, name, desc);
       onExerciseChange();
     }
     onClose();
@@ -66,7 +64,7 @@ export default function CreateExerciseModal({
 
   const handleDelete = () => {
     if (initialExercise) {
-      deleteExercise(db, initialExercise.id);
+      deleteExercise(initialExercise.id);
       onExerciseChange();
       onClose();
     }
@@ -87,7 +85,7 @@ export default function CreateExerciseModal({
                 {initialExercise ? "Edit Exercise" : "Create Exercise"}
               </ThemedText>
               <Pressable onPress={onClose}>
-                <ThemedIcon name="Check" size={24} />
+                <ThemedIcon name="X" size={24} />
               </Pressable>
             </View>
 

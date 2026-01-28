@@ -1,7 +1,17 @@
-import { type SQLiteDatabase } from "expo-sqlite";
+import { openDatabaseSync, type SQLiteDatabase } from "expo-sqlite";
 import { Exercise, SubmitExercise, Workout } from "./databaseTypes";
 
-export function createExercise(db: SQLiteDatabase, name: string, desc: string) {
+let db: SQLiteDatabase | undefined = undefined;
+
+function getDatabase() {
+  if (!db) {
+    db = openDatabaseSync("exercise.db", { useNewConnection: true });
+  }
+  return db;
+}
+
+export function createExercise(name: string, desc: string) {
+  const db = getDatabase();
   const result = db.runSync(
     "INSERT INTO exercises (name, description) VALUES ($name, $description)",
     { $name: name, $description: desc },
@@ -9,14 +19,13 @@ export function createExercise(db: SQLiteDatabase, name: string, desc: string) {
   return result.lastInsertRowId;
 }
 
-export function getAllExercises(db: SQLiteDatabase): Exercise[] {
+export function getAllExercises(): Exercise[] {
+  const db = getDatabase();
   return db.getAllSync<Exercise>("SELECT * FROM exercises");
 }
 
-export function getSomeExercises(
-  db: SQLiteDatabase,
-  ids: number[],
-): Exercise[] {
+export function getSomeExercises(ids: number[]): Exercise[] {
+  const db = getDatabase();
   const questionMarks = "?,".repeat(ids.length - 1) + "?";
   return db.getAllSync(
     `SELECT * FROM exercises WHERE id IN (${questionMarks})`,
@@ -24,27 +33,26 @@ export function getSomeExercises(
   );
 }
 
-export function updateExercise(
-  db: SQLiteDatabase,
-  id: number,
-  name: string,
-  desc: string,
-) {
+export function updateExercise(id: number, name: string, desc: string) {
+  const db = getDatabase();
   db.runSync(
     "UPDATE exercises SET name = $name, description = $description WHERE id = $id",
     { $id: id, $name: name, $description: desc },
   );
 }
 
-export function deleteExercise(db: SQLiteDatabase, id: number) {
+export function deleteExercise(id: number) {
+  const db = getDatabase();
   db.runSync("DELETE FROM exercises WHERE id = $id", { $id: id });
 }
 
-export function getAllWourkouts(db: SQLiteDatabase): Workout[] {
+export function getAllWourkouts(): Workout[] {
+  const db = getDatabase();
   return db.getAllSync("SELECT * FROM workouts");
 }
 
-export function getSomeWorkouts(db: SQLiteDatabase, ids: number[]) {
+export function getSomeWorkouts(ids: number[]) {
+  const db = getDatabase();
   const questionMarks = "?,".repeat(ids.length - 1) + "?";
   return db.getAllSync(
     `SELECT * FROM workouts WHERE id IN (${questionMarks})`,
@@ -52,11 +60,13 @@ export function getSomeWorkouts(db: SQLiteDatabase, ids: number[]) {
   );
 }
 
-export function getOneWorkout(db: SQLiteDatabase, id: string): Workout | null {
+export function getOneWorkout(id: string): Workout | null {
+  const db = getDatabase();
   return db.getFirstSync("SELECT * FROM workouts WHERE id = $id", { $id: id });
 }
 
-export function getExercisesFromWorkout(db: SQLiteDatabase, workoutID: number) {
+export function getExercisesFromWorkout(workoutID: number) {
+  const db = getDatabase();
   const workoutExercises: {
     exercise_id: number;
     duration: number;
@@ -67,7 +77,7 @@ export function getExercisesFromWorkout(db: SQLiteDatabase, workoutID: number) {
   );
 
   const exercisesIDs = workoutExercises.map((ex) => ex.exercise_id);
-  const exercises: Exercise[] = getSomeExercises(db, exercisesIDs);
+  const exercises: Exercise[] = getSomeExercises(exercisesIDs);
 
   const exerciseMap = new Map(exercises.map((ex) => [ex.id, ex]));
 
@@ -82,12 +92,12 @@ export function getExercisesFromWorkout(db: SQLiteDatabase, workoutID: number) {
 }
 
 export function createWorkout(
-  db: SQLiteDatabase,
   emoji: string,
   name: string,
   rest: number,
   exercises: SubmitExercise[],
 ) {
+  const db = getDatabase();
   const result = db.runSync(
     "INSERT INTO workouts (emoji, name, rest) VALUES ($emoji, $name, $rest)",
     { $emoji: emoji, $name: name, $rest: rest },
@@ -114,13 +124,13 @@ export function createWorkout(
 }
 
 export function updateWorkout(
-  db: SQLiteDatabase,
   id: number,
   emoji: string,
   name: string,
   rest: number,
   exercises: SubmitExercise[],
 ) {
+  const db = getDatabase();
   db.runSync(
     "UPDATE workouts SET emoji = $emoji, name = $name, rest = $rest WHERE id = $id",
     { $id: id, $emoji: emoji, $name: name, $rest: rest },
@@ -149,6 +159,7 @@ export function updateWorkout(
   }
 }
 
-export function deleteWorkout(db: SQLiteDatabase, id: number) {
+export function deleteWorkout(id: number) {
+  const db = getDatabase();
   db.runSync("DELETE FROM workouts WHERE id = $id", { $id: id });
 }

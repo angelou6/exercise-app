@@ -6,7 +6,6 @@ import {
   getOneWorkout,
 } from "@/utils/database";
 import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
-import { openDatabaseSync } from "expo-sqlite";
 import { useCallback, useState } from "react";
 import {
   Alert,
@@ -19,22 +18,18 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const App = () => {
-  const db = openDatabaseSync("exercise.db", { useNewConnection: true });
   const { workoutID } = useLocalSearchParams();
   const cardTheme = useCardTheme();
 
-  const [workout, setWorkout] = useState(
-    getOneWorkout(db, workoutID.toString()),
-  );
+  const [workout, setWorkout] = useState(getOneWorkout(workoutID.toString()));
   const [exercises, setExercises] = useState(
-    getExercisesFromWorkout(db, parseInt(workoutID.toString())),
+    getExercisesFromWorkout(parseInt(workoutID.toString())),
   );
 
   useFocusEffect(
     useCallback(() => {
-      const updatedWorkout = getOneWorkout(db, workoutID.toString());
+      const updatedWorkout = getOneWorkout(workoutID.toString());
       const updatedExercises = getExercisesFromWorkout(
-        db,
         parseInt(workoutID.toString()),
       );
       setWorkout(updatedWorkout);
@@ -57,7 +52,7 @@ const App = () => {
           text: "Delete",
           style: "destructive",
           onPress: () => {
-            deleteWorkout(db, parseInt(workoutID.toString()));
+            deleteWorkout(parseInt(workoutID.toString()));
             router.push("/");
           },
         },

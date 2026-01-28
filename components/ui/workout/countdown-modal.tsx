@@ -1,5 +1,6 @@
 import { ThemedModal } from "@/components/themed/themed-modal";
 import { useAudioPlayer } from "expo-audio";
+import { router } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
@@ -56,7 +57,9 @@ export default function CountdownModal({
       visible={visible}
       presentationStyle="overFullScreen"
       style={styles.overlay}
-      onRequestClose={() => {}}
+      onRequestClose={() => {
+        router.back();
+      }}
     >
       <View style={styles.topContainer}>
         <View style={styles.row}>

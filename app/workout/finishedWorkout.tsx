@@ -14,7 +14,7 @@ const App = () => {
   const { wID } = useLocalSearchParams();
   const partyPopperAudio = useAudioPlayer(partyPopperSource);
 
-  const workout = useMemo(() => getOneWorkout(String(wID)), [wID]);
+  const workout = useMemo(() => getOneWorkout(Number(wID)), [wID]);
 
   const handleGoHome = () => {
     router.replace("/");
@@ -23,7 +23,7 @@ const App = () => {
   const handleRestart = () => {
     if (!workout) return handleGoHome();
     router.replace({
-      pathname: "/wourkout/workout",
+      pathname: "/workout/workout",
       params: {
         wID: workout.id.toString(),
         wRest: workout.rest.toString(),

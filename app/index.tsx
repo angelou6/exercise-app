@@ -2,7 +2,7 @@ import { ThemedButton, ThemedIcon, ThemedText } from "@/components/themed";
 import { Colors } from "@/constants/theme";
 import { useCardTheme } from "@/hooks/use-card-theeme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
-import { getAllWourkouts } from "@/utils/database";
+import { getAllWorkouts } from "@/utils/database";
 import { type Workout } from "@/utils/databaseTypes";
 import { getTodayString, getYesterdayString } from "@/utils/streakUtils";
 import { router, useFocusEffect } from "expo-router";
@@ -54,7 +54,7 @@ const App = () => {
   useFocusEffect(
     useCallback(() => {
       try {
-        setWorkouts(getAllWourkouts());
+        setWorkouts(getAllWorkouts());
       } catch {
         setWorkouts([]);
       }
@@ -95,7 +95,7 @@ const App = () => {
                 key={item.id}
                 onPress={() =>
                   router.push({
-                    pathname: "/wourkout/startWorkout",
+                    pathname: "/workout/startWorkout",
                     params: {
                       workoutID: item.id,
                     },
@@ -137,7 +137,7 @@ const App = () => {
       </ScrollView>
       <View style={styles.footer}>
         <ThemedButton
-          onPress={() => router.push("/wourkout/createWorkout")}
+          onPress={() => router.push("/workout/createWorkout")}
           style={styles.addButton}
         >
           <ThemedIcon name="Plus" size={24} />

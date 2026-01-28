@@ -4,12 +4,15 @@ import ProgressBar from "@/components/ui/workout/progressBar";
 import { useCardTheme } from "@/hooks/use-card-theeme";
 import { getExercisesFromWorkout } from "@/utils/database";
 import { useAudioPlayer } from "expo-audio";
+import { useKeepAwake } from "expo-keep-awake";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const App = () => {
+  useKeepAwake();
+
   const { wID, wRest } = useLocalSearchParams();
   const cardTheme = useCardTheme();
 
@@ -36,9 +39,11 @@ const App = () => {
     if (exerciseIndex + 1 < exercises.length) {
       setIsExercise(false);
       setTimeLeft(restDuration);
+      dingAudio.seekTo(0);
+      dingAudio.play();
     } else {
       router.replace({
-        pathname: "/wourkout/finishedWorkout",
+        pathname: "/workout/finishedWorkout",
         params: { wID },
       });
     }
@@ -63,6 +68,8 @@ const App = () => {
 
   const handleRestFinished = () => {
     changeExercise("next");
+    dingAudio.seekTo(0);
+    dingAudio.play();
   };
 
   const handlePrevious = () => {
@@ -85,8 +92,6 @@ const App = () => {
     } else {
       handleRestFinished();
     }
-    dingAudio.seekTo(0);
-    dingAudio.play();
   };
 
   useEffect(() => {
@@ -102,7 +107,7 @@ const App = () => {
       return;
     }
 
-    let interval = setInterval(() => {
+    const interval = setInterval(() => {
       setTimeLeft((time) => time - 1);
       if (timeLeft <= 1) {
         handleFinished();
@@ -139,7 +144,9 @@ const App = () => {
         <View>
           {isExercise ? (
             <View style={styles.exerciseContainer}>
-              <ThemedText type="title">{name}</ThemedText>
+              <ThemedText style={styles.titleText} type="title">
+                {name}
+              </ThemedText>
               {description ? (
                 <ThemedText type="dimmed">{description}</ThemedText>
               ) : null}
@@ -212,6 +219,9 @@ const styles = StyleSheet.create({
   exerciseContainer: {
     alignItems: "center",
     gap: 10,
+  },
+  titleText: {
+    textAlign: "center",
   },
   content: {
     flex: 1,

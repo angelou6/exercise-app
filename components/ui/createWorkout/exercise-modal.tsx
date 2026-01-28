@@ -6,12 +6,13 @@ import {
   ThemedText,
 } from "@/components/themed";
 import { Colors } from "@/constants/theme";
-import { getAllExercises } from "@/utils/database";
+import { deleteExercise, getAllExercises } from "@/utils/database";
 import { SubmitExercise, type Exercise } from "@/utils/databaseTypes";
 import { useFocusEffect } from "expo-router";
 import Fuse from "fuse.js";
 import React, { useCallback, useMemo, useState } from "react";
 import {
+  Alert,
   FlatList,
   Pressable,
   StyleSheet,
@@ -79,6 +80,18 @@ export default function AddExerciseModal({
     } else {
       addExecise(exercise);
     }
+  };
+
+  const handleDeleteExercise = (id: number) => {
+    deleteExercise(id);
+    const updatedExercises = getAllExercises();
+    setExercises(updatedExercises);
+
+    if (fuzzyExercises.length > 0) {
+      setFuzzyExercises((prev) => prev.filter((e) => e.id !== id));
+    }
+
+    removeExercise(id);
   };
 
   const handleExerciseChange = (newExerciseId: number | undefined | null) => {
@@ -168,15 +181,26 @@ export default function AddExerciseModal({
                 )}
               </View>
               <Pressable
-                onPress={(e) => {
-                  e.stopPropagation();
-                  setEditingExercise(item);
-                  setCreateModalVisible(true);
+                onPress={() => {
+                  Alert.alert(
+                    "Delete Exercise",
+                    `Are you sure you want to delete ${item.name}?`,
+                    [
+                      { text: "Cancel", style: "cancel" },
+                      {
+                        text: "Delete",
+                        style: "destructive",
+                        onPress: () => {
+                          handleDeleteExercise(item.id);
+                        },
+                      },
+                    ],
+                  );
                 }}
                 hitSlop={10}
                 style={styles.iconButton}
               >
-                <ThemedIcon name="Pencil" size={18} />
+                <ThemedIcon name="Trash2" size={18} />
               </Pressable>
             </Pressable>
           );

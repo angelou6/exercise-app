@@ -1,8 +1,11 @@
 import { ThemedIcon, ThemedInput, ThemedText } from "@/components/themed";
 import { CardTheme } from "@/constants/theme";
-import { SubmitExercise } from "@/utils/databaseTypes";
+import { getOneExercise } from "@/utils/database";
+import { Exercise, SubmitExercise } from "@/utils/databaseTypes";
+import React, { useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import { useReorderableDrag } from "react-native-reorderable-list";
+import CreateExerciseModal from "./create-exercise-modal";
 
 type Item = {
   item: SubmitExercise;
@@ -10,6 +13,7 @@ type Item = {
   updateExerciseDuration: (item: SubmitExercise, time: number) => void;
   defaultDuration: number;
   deleteExercise: (id: number) => void;
+  onExerciseUpdate?: (exercise: Exercise) => void;
 };
 
 export default function DragableItem({
@@ -18,8 +22,22 @@ export default function DragableItem({
   updateExerciseDuration,
   defaultDuration,
   deleteExercise,
+  onExerciseUpdate,
 }: Item) {
   const drag = useReorderableDrag();
+  const [createModalVisible, setCreateModalVisible] = useState(false);
+
+  const handleExerciseChange = () => {
+    const updated = getOneExercise(item.exercise.id);
+    if (updated) {
+      if (onExerciseUpdate) {
+        onExerciseUpdate(updated);
+      }
+    } else {
+      deleteExercise(item.exercise.id);
+    }
+  };
+
   return (
     <View
       style={[
@@ -30,6 +48,12 @@ export default function DragableItem({
         },
       ]}
     >
+      <CreateExerciseModal
+        visible={createModalVisible}
+        onClose={() => setCreateModalVisible(false)}
+        initialExercise={item.exercise}
+        onExerciseChange={handleExerciseChange}
+      />
       <Pressable onPressIn={drag} style={styles.dragHandle} hitSlop={12}>
         <ThemedIcon name="GripVertical" color={cardTheme.sub} />
       </Pressable>
@@ -58,6 +82,15 @@ export default function DragableItem({
           />
           <ThemedText style={styles.timeUnit}>s</ThemedText>
         </View>
+        <Pressable
+          style={styles.iconButton}
+          onPress={(e) => {
+            e.stopPropagation();
+            setCreateModalVisible(true);
+          }}
+        >
+          <ThemedIcon name="Pencil" size={20} color={cardTheme.sub} />
+        </Pressable>
         <Pressable
           style={styles.iconButton}
           onPress={() => deleteExercise(item.exercise.id)}

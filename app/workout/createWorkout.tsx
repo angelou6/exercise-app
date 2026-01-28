@@ -92,6 +92,17 @@ const App = () => {
     );
   };
 
+  const updateExerciseInList = (updatedEx: Exercise) => {
+    setExercises((prev) =>
+      prev.map((ex) => {
+        if (ex.exercise.id === updatedEx.id) {
+          return { ...ex, exercise: updatedEx };
+        }
+        return ex;
+      }),
+    );
+  };
+
   const handleReorder = ({ from, to }: ReorderableListReorderEvent) => {
     setExercises((value) => reorderItems(value, from, to));
   };
@@ -148,6 +159,7 @@ const App = () => {
                 defaultDuration={item.duration}
                 updateExerciseDuration={updateExerciseDuration}
                 deleteExercise={deleteExercise}
+                onExerciseUpdate={updateExerciseInList}
               />
             )}
           />

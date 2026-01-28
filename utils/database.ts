@@ -26,11 +26,25 @@ export function getAllExercises(): Exercise[] {
 
 export function getSomeExercises(ids: number[]): Exercise[] {
   const db = getDatabase();
-  const questionMarks = "?,".repeat(ids.length - 1) + "?";
-  return db.getAllSync(
-    `SELECT * FROM exercises WHERE id IN (${questionMarks})`,
-    ids,
-  );
+  if (!ids.length) {
+    return [];
+  }
+
+  try {
+    const questionMarks = "?,".repeat(ids.length - 1) + "?";
+    return db.getAllSync(
+      `SELECT * FROM exercises WHERE id IN (${questionMarks})`,
+      ids,
+    );
+  } catch (error) {
+    console.error("getSomeExercises failed for ids:", ids, error);
+    return [];
+  }
+}
+
+export function getOneExercise(id: number): Exercise | null {
+  const db = getDatabase();
+  return db.getFirstSync("SELECT * FROM exercises WHERE id = $id", { $id: id });
 }
 
 export function updateExercise(id: number, name: string, desc: string) {
@@ -43,24 +57,38 @@ export function updateExercise(id: number, name: string, desc: string) {
 
 export function deleteExercise(id: number) {
   const db = getDatabase();
-  db.runSync("DELETE FROM exercises WHERE id = $id", { $id: id });
+  db.withTransactionSync(() => {
+    db.runSync("DELETE FROM workout_exercises WHERE exercise_id = $id", {
+      $id: id,
+    });
+    db.runSync("DELETE FROM exercises WHERE id = $id", { $id: id });
+  });
 }
 
-export function getAllWourkouts(): Workout[] {
+export function getAllWorkouts(): Workout[] {
   const db = getDatabase();
   return db.getAllSync("SELECT * FROM workouts");
 }
 
-export function getSomeWorkouts(ids: number[]) {
+export function getSomeWorkouts(ids: number[]): Workout[] {
   const db = getDatabase();
-  const questionMarks = "?,".repeat(ids.length - 1) + "?";
-  return db.getAllSync(
-    `SELECT * FROM workouts WHERE id IN (${questionMarks})`,
-    ids,
-  );
+  if (!ids.length) {
+    return [];
+  }
+
+  try {
+    const questionMarks = "?,".repeat(ids.length - 1) + "?";
+    return db.getAllSync(
+      `SELECT * FROM workouts WHERE id IN (${questionMarks})`,
+      ids,
+    );
+  } catch (error) {
+    console.error("getSomeWorkouts failed for ids:", ids, error);
+    return [];
+  }
 }
 
-export function getOneWorkout(id: string): Workout | null {
+export function getOneWorkout(id: number): Workout | null {
   const db = getDatabase();
   return db.getFirstSync("SELECT * FROM workouts WHERE id = $id", { $id: id });
 }
@@ -81,14 +109,21 @@ export function getExercisesFromWorkout(workoutID: number) {
 
   const exerciseMap = new Map(exercises.map((ex) => [ex.id, ex]));
 
-  return workoutExercises.map((workoutEx) => {
-    const exercise = exerciseMap.get(workoutEx.exercise_id);
-    return {
-      exercise: exercise!,
-      order: workoutEx.exercise_order,
-      duration: workoutEx.duration,
-    };
-  });
+  return workoutExercises
+    .map((workoutEx) => {
+      const exercise = exerciseMap.get(workoutEx.exercise_id);
+      if (!exercise) return null;
+      return {
+        exercise: exercise,
+        order: workoutEx.exercise_order,
+        duration: workoutEx.duration,
+      };
+    })
+    .filter((ex) => ex !== null) as {
+    exercise: Exercise;
+    order: number;
+    duration: number;
+  }[];
 }
 
 export function createWorkout(

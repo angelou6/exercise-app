@@ -43,7 +43,7 @@ export default function CountdownModal({
 
   useEffect(
     useCallback(() => {
-      if (timeLeft < 5 && timeLeft > 0) {
+      if (timeLeft <= 5 && timeLeft > 0) {
         clickAudio.seekTo(0);
         clickAudio.play();
       }

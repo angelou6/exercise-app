@@ -21,17 +21,15 @@ const App = () => {
   const { workoutID } = useLocalSearchParams();
   const cardTheme = useCardTheme();
 
-  const [workout, setWorkout] = useState(getOneWorkout(workoutID.toString()));
+  const [workout, setWorkout] = useState(getOneWorkout(Number(workoutID)));
   const [exercises, setExercises] = useState(
-    getExercisesFromWorkout(parseInt(workoutID.toString())),
+    getExercisesFromWorkout(Number(workoutID)),
   );
 
   useFocusEffect(
     useCallback(() => {
-      const updatedWorkout = getOneWorkout(workoutID.toString());
-      const updatedExercises = getExercisesFromWorkout(
-        parseInt(workoutID.toString()),
-      );
+      const updatedWorkout = getOneWorkout(Number(workoutID));
+      const updatedExercises = getExercisesFromWorkout(Number(workoutID));
       setWorkout(updatedWorkout);
       setExercises(updatedExercises);
     }, [workoutID]),
@@ -39,8 +37,11 @@ const App = () => {
 
   if (!workout) return null;
 
-  const totalDuration = exercises.reduce((sum, ex) => sum + ex.duration, 0);
-  const totalTime = totalDuration + (exercises.length - 1) * workout.rest;
+  let totalTime = 0;
+  if (exercises.length > 0) {
+    const totalDuration = exercises.reduce((sum, ex) => sum + ex.duration, 0);
+    totalTime = totalDuration + (exercises.length - 1) * workout.rest;
+  }
 
   const handleDelete = () => {
     Alert.alert(
@@ -52,7 +53,7 @@ const App = () => {
           text: "Delete",
           style: "destructive",
           onPress: () => {
-            deleteWorkout(parseInt(workoutID.toString()));
+            deleteWorkout(Number(workoutID));
             router.push("/");
           },
         },
@@ -62,7 +63,7 @@ const App = () => {
 
   const handleEdit = () => {
     router.push({
-      pathname: "/wourkout/createWorkout",
+      pathname: "/workout/createWorkout",
       params: {
         wID: workoutID,
         wEmoji: workout.emoji,
@@ -74,7 +75,7 @@ const App = () => {
 
   const handleStart = () => {
     router.push({
-      pathname: "/wourkout/workout",
+      pathname: "/workout/workout",
       params: {
         wID: workoutID,
         wRest: workout.rest,
@@ -167,7 +168,14 @@ const App = () => {
         </View>
       </ScrollView>
       <View style={styles.footer}>
-        <ThemedButton onPress={handleStart} style={styles.startButton}>
+        <ThemedButton
+          disabled={exercises.length === 0}
+          onPress={handleStart}
+          style={[
+            styles.startButton,
+            exercises.length === 0 && styles.controlButtonDisabled,
+          ]}
+        >
           <ThemedIcon name="Play" size={24} />
           <Text>Start Workout</Text>
         </ThemedButton>
@@ -229,6 +237,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
+  },
+  controlButtonDisabled: {
+    opacity: 0.3,
   },
   statText: {
     fontSize: 13,

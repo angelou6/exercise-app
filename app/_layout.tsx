@@ -14,6 +14,7 @@ import * as SystemUI from "expo-system-ui";
 
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import { Suspense } from "react";
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
@@ -25,10 +26,12 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <SQLiteProvider databaseName="exercise.db" onInit={migration}>
-        <StatusBar style="auto" />
-        <Stack screenOptions={{ headerShown: false }} />
-      </SQLiteProvider>
+      <Suspense>
+        <SQLiteProvider databaseName="exercise.db" onInit={migration}>
+          <StatusBar style="auto" />
+          <Stack screenOptions={{ headerShown: false }} />
+        </SQLiteProvider>
+      </Suspense>
     </ThemeProvider>
   );
 }

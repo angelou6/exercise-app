@@ -130,8 +130,6 @@ const App = () => {
         visible={timeModalVisible}
         onClose={() => setTimeModalVisible(false)}
         onSelect={(hour, minute) => handleNotification(hour, minute)}
-        defaultHour={reminderTime.hour}
-        defaultMinute={reminderTime.minute}
       />
       <RadioSelectModal
         visible={themeModalVisible}

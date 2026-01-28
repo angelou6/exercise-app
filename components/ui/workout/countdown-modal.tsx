@@ -56,7 +56,7 @@ export default function CountdownModal({
       visible={visible}
       presentationStyle="overFullScreen"
       style={styles.overlay}
-      onRequestClose={onClose}
+      onRequestClose={() => {}}
     >
       <View style={styles.topContainer}>
         <View style={styles.row}>

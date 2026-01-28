@@ -2,7 +2,8 @@ import { ThemedButton } from "@/components/themed/themed-button";
 import { ThemedInput } from "@/components/themed/themed-input";
 import { ThemedText } from "@/components/themed/themed-text";
 import { useThemeColor } from "@/hooks/use-theme-color";
-import { useState } from "react";
+import Storage from "expo-sqlite/kv-store";
+import { useEffect, useState } from "react";
 import {
   Modal,
   Pressable,
@@ -16,20 +17,25 @@ interface TimeSelectModalProps {
   visible: boolean;
   onClose: () => void;
   onSelect: (hour: string, minute: string) => void;
-  defaultHour?: string;
-  defaultMinute?: string;
 }
 
 export default function TimeSelectModal({
   visible,
   onClose,
   onSelect,
-  defaultHour = "",
-  defaultMinute = "",
 }: TimeSelectModalProps) {
-  const [hour, setHour] = useState(defaultHour);
-  const [minute, setMinute] = useState(defaultMinute);
   const backgroundColor = useThemeColor({}, "background");
+  const [hour, setHour] = useState("16");
+  const [minute, setMinute] = useState("00");
+
+  useEffect(() => {
+    const savedTime = Storage.getItemSync("notificationTime");
+    if (savedTime) {
+      const time = JSON.parse(savedTime);
+      setHour(time.hour);
+      setMinute(time.minute);
+    }
+  });
 
   const formatTime = (time: string, maxTime: number) => {
     let formatedTime = time;

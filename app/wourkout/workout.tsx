@@ -5,13 +5,13 @@ import { useCardTheme } from "@/hooks/use-card-theeme";
 import { getExercisesFromWorkout } from "@/utils/database";
 import { useAudioPlayer } from "expo-audio";
 import { router, useLocalSearchParams } from "expo-router";
-import { useSQLiteContext } from "expo-sqlite";
+import { openDatabaseSync } from "expo-sqlite";
 import { useEffect, useMemo, useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const App = () => {
-  const db = useSQLiteContext();
+  const db = openDatabaseSync("exercise.db", { useNewConnection: true });
   const { wID, wRest } = useLocalSearchParams();
   const cardTheme = useCardTheme();
 

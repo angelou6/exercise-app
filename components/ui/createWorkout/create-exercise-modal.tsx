@@ -87,7 +87,7 @@ export default function CreateExerciseModal({
                 {initialExercise ? "Edit Exercise" : "Create Exercise"}
               </ThemedText>
               <Pressable onPress={onClose}>
-                <ThemedIcon name="X" size={24} />
+                <ThemedIcon name="Check" size={24} />
               </Pressable>
             </View>
 

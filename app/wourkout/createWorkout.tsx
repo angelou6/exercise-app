@@ -10,7 +10,7 @@ import {
 } from "@/utils/database";
 import { type Exercise, type SubmitExercise } from "@/utils/databaseTypes";
 import { router, useLocalSearchParams } from "expo-router";
-import { useSQLiteContext } from "expo-sqlite";
+import { openDatabaseSync } from "expo-sqlite";
 import { useEffect, useState } from "react";
 import {
   ListRenderItemInfo,
@@ -27,7 +27,7 @@ import ReorderableList, {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const App = () => {
-  const db = useSQLiteContext();
+  const db = openDatabaseSync("exercise.db", { useNewConnection: true });
   const { wID, wEmoji, wName, wRest } = useLocalSearchParams();
   const cardTheme = useCardTheme();
 
@@ -75,13 +75,14 @@ const App = () => {
   };
 
   const handleUpdateWorkout = () => {
+    console.log(Number(String(wID)), emoji, name, Number(restTime), exercises);
     if (!name.trim()) return;
     updateWorkout(
       db,
-      parseInt(wID.toString()),
+      Number(String(wID)),
       emoji,
       name,
-      parseInt(restTime),
+      Number(restTime),
       exercises,
     );
     router.back();

@@ -3,7 +3,7 @@ import { getOneWorkout } from "@/utils/database";
 import { getTodayString, getYesterdayString } from "@/utils/streakUtils";
 import { useAudioPlayer } from "expo-audio";
 import { router, useLocalSearchParams } from "expo-router";
-import { useSQLiteContext } from "expo-sqlite";
+import { openDatabaseSync } from "expo-sqlite";
 import { Storage } from "expo-sqlite/kv-store";
 import { useEffect, useMemo } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
@@ -12,7 +12,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 const partyPopperSource = require("../../assets/audio/partypopper.mp3");
 
 const App = () => {
-  const db = useSQLiteContext();
+  const db = openDatabaseSync("exercise.db", { useNewConnection: true });
   const { wID } = useLocalSearchParams();
   const partyPopperAudio = useAudioPlayer(partyPopperSource);
 

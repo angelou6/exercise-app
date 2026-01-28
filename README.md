@@ -1,7 +1,3 @@
-<div align="center">
-  <img width="240" height="131" alt="dumbbell" src="https://github.com/user-attachments/assets/19a4d789-573a-4a11-ac9e-cc0d9ce156e9" />
-</div>
-
 # Exercise App
 
 This is a very simple exercise app written in React Native

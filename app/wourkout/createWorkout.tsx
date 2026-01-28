@@ -109,7 +109,7 @@ const App = () => {
           modalVisible={modalVisible}
           addExecise={addExercise}
           removeExercise={deleteExercise}
-          setModalVisible={setModalVisible}
+          onClose={() => setModalVisible(false)}
           selected={exercises}
         />
 

@@ -1,14 +1,16 @@
 import {
   ThemedButton,
   ThemedIcon,
+  ThemedInput,
   ThemedModal,
   ThemedText,
 } from "@/components/themed";
-import { CardColor, Colors } from "@/constants/theme";
+import { Colors } from "@/constants/theme";
 import { getAllExercises } from "@/utils/database";
 import { SubmitExercise, type Exercise } from "@/utils/databaseTypes";
 import { useFocusEffect } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
+import Fuse from "fuse.js";
 import React, { useCallback, useMemo, useState } from "react";
 import {
   FlatList,
@@ -22,7 +24,7 @@ import CreateExerciseModal from "./create-exercise-modal";
 
 type exerciseSelect = {
   modalVisible: boolean;
-  setModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
+  onClose: () => void;
   addExecise: (newEx: Exercise) => void;
   removeExercise: (exID: number) => void;
   selected: SubmitExercise[];
@@ -30,7 +32,7 @@ type exerciseSelect = {
 
 export default function AddExerciseModal({
   modalVisible,
-  setModalVisible,
+  onClose,
   addExecise,
   removeExercise,
   selected,
@@ -42,12 +44,17 @@ export default function AddExerciseModal({
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const [editingExercise, setEditingExercise] = useState<Exercise | null>(null);
 
-  const theme = useColorScheme() ?? "light";
-  const cardTheme = useMemo(
-    () => (theme === "light" ? CardColor.dark : CardColor.light),
-    [theme],
+  const [fuzzyExercises, setFuzzyExercises] = useState<Exercise[]>([]);
+  const fuse = useMemo(
+    () =>
+      new Fuse(exercises, {
+        keys: ["name", "description"],
+        threshold: 0.6,
+      }),
+    [exercises],
   );
 
+  const theme = useColorScheme() ?? "light";
   const tintColor = theme === "light" ? Colors.light.tint : Colors.dark.tint;
 
   const selectedIncludes = (newEx: Exercise) => {
@@ -93,9 +100,7 @@ export default function AddExerciseModal({
       animationType="slide"
       presentationStyle="pageSheet"
       visible={modalVisible}
-      onRequestClose={() => {
-        setModalVisible(!modalVisible);
-      }}
+      onRequestClose={onClose}
     >
       <CreateExerciseModal
         visible={createModalVisible}
@@ -105,17 +110,23 @@ export default function AddExerciseModal({
       />
       <View style={styles.header}>
         <ThemedText type="title">Select Exercises</ThemedText>
-        <Pressable
-          onPress={() => {
-            setEditingExercise(null);
-            setCreateModalVisible(true);
-          }}
-        >
-          <ThemedIcon name="Plus" />
+        <Pressable onPress={onClose}>
+          <ThemedIcon name="X" />
         </Pressable>
       </View>
+      <View style={styles.searchContainer}>
+        <ThemedIcon name="Search" size={20} variant="dimmed" />
+        <ThemedInput
+          style={styles.searchInput}
+          placeholder="Search exercises..."
+          onChangeText={(text) => {
+            const results = fuse.search(text);
+            setFuzzyExercises(results.map((r) => r.item));
+          }}
+        />
+      </View>
       <FlatList
-        data={exercises}
+        data={fuzzyExercises.length > 0 ? fuzzyExercises : exercises}
         keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={styles.listContainer}
         ListEmptyComponent={
@@ -144,7 +155,7 @@ export default function AddExerciseModal({
                   <ThemedIcon
                     variant="dimmed"
                     name="Circle"
-                    color={cardTheme.sub}
+                    color={tintColor}
                     size={defaultIconSize}
                   />
                 )}
@@ -178,10 +189,12 @@ export default function AddExerciseModal({
         <ThemedButton
           style={styles.createButton}
           onPress={() => {
-            setModalVisible(false);
+            setEditingExercise(null);
+            setCreateModalVisible(true);
           }}
         >
-          <Text>Close</Text>
+          <ThemedIcon name="Plus" />
+          <Text>Add Exercise</Text>
         </ThemedButton>
       </View>
     </ThemedModal>
@@ -195,6 +208,23 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 20,
     paddingVertical: 16,
+  },
+  searchContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginHorizontal: 16,
+    marginBottom: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 12,
+    backgroundColor: "rgba(128, 128, 128, 0.1)",
+    gap: 12,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 16,
+    padding: 0,
+    margin: 0,
   },
   listContainer: {
     paddingHorizontal: 16,

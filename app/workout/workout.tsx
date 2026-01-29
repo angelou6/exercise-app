@@ -152,7 +152,14 @@ const App = () => {
               ) : null}
             </View>
           ) : (
-            <ThemedText type="title">Rest Time</ThemedText>
+            <View style={styles.exerciseContainer}>
+              <ThemedText type="title">Rest Time</ThemedText>
+              <ThemedText type="dimmed">
+                {exerciseIndex <= exercises.length
+                  ? "Up Next: " + exercises[exerciseIndex + 1].exercise.name
+                  : ""}
+              </ThemedText>
+            </View>
           )}
         </View>
 

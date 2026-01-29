@@ -85,7 +85,7 @@ const App = () => {
     setExercises(
       exercises.map((ex) => {
         if (ex === exercise) {
-          return { ...ex, duration: time };
+          return { ...ex, duration: time > 0 ? time : 1 };
         }
         return ex;
       }),
@@ -218,6 +218,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
+    marginTop: 20,
     gap: 8,
   },
   footer: {

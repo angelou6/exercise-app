@@ -35,7 +35,7 @@ export default function TimeSelectModal({
       setHour(time.hour);
       setMinute(time.minute);
     }
-  });
+  }, []);
 
   const formatTime = (time: string, maxTime: number) => {
     let formatedTime = time;
@@ -75,7 +75,6 @@ export default function TimeSelectModal({
                   style={styles.input}
                   keyboardType="numeric"
                   maxLength={2}
-                  placeholder="00"
                   value={hour}
                   onChangeText={setHour}
                 />
@@ -87,7 +86,6 @@ export default function TimeSelectModal({
                   style={styles.input}
                   keyboardType="numeric"
                   maxLength={2}
-                  placeholder="00"
                   value={minute}
                   onChangeText={setMinute}
                 />
@@ -98,7 +96,16 @@ export default function TimeSelectModal({
               <ThemedButton onPress={onClose} style={styles.button}>
                 <Text>Cancel</Text>
               </ThemedButton>
-              <ThemedButton onPress={handleSave} style={styles.button}>
+              <ThemedButton
+                onPress={handleSave}
+                disabled={!hour.trim() || !minute.trim()}
+                style={[
+                  styles.button,
+                  (!hour.trim() || !minute.trim()) && {
+                    opacity: 0.5,
+                  },
+                ]}
+              >
                 <Text>Save</Text>
               </ThemedButton>
             </View>

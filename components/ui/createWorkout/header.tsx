@@ -5,6 +5,7 @@ import {
   ThemedText,
 } from "@/components/themed";
 import { CardTheme } from "@/constants/theme";
+import { validateNumberInput } from "@/utils/input";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
@@ -83,7 +84,10 @@ export default function WorkoutHeader({
               keyboardType="numeric"
               placeholder={defaultRestTime.toString()}
               value={restTime}
-              onChangeText={setRestTime}
+              maxLength={3}
+              onChangeText={(text) =>
+                validateNumberInput(text) && setRestTime(text)
+              }
               style={styles.restInputField}
             />
             <ThemedText style={styles.unit}>s</ThemedText>

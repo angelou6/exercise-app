@@ -2,6 +2,7 @@ import { ThemedIcon, ThemedInput, ThemedText } from "@/components/themed";
 import { CardTheme } from "@/constants/theme";
 import { getOneExercise } from "@/utils/database";
 import { Exercise, SubmitExercise } from "@/utils/databaseTypes";
+import { validateNumberInput } from "@/utils/input";
 import React, { useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import { useReorderableDrag } from "react-native-reorderable-list";
@@ -26,6 +27,7 @@ export default function DragableItem({
 }: Item) {
   const drag = useReorderableDrag();
   const [createModalVisible, setCreateModalVisible] = useState(false);
+  const [exTime, setExTime] = useState("");
 
   const handleExerciseChange = () => {
     const updated = getOneExercise(item.exercise.id);
@@ -75,9 +77,14 @@ export default function DragableItem({
           <ThemedInput
             keyboardType="numeric"
             placeholder={defaultDuration.toString()}
-            onChangeText={(time) =>
-              updateExerciseDuration(item, parseInt(time))
-            }
+            maxLength={3}
+            value={exTime}
+            onChangeText={(time) => {
+              if (validateNumberInput(time)) {
+                setExTime(time);
+                updateExerciseDuration(item, parseInt(time));
+              }
+            }}
             style={styles.timeInput}
           />
           <ThemedText style={styles.timeUnit}>s</ThemedText>

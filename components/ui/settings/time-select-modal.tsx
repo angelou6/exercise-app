@@ -27,6 +27,15 @@ export default function TimeSelectModal({
   const backgroundColor = useThemeColor({}, "background");
   const [hour, setHour] = useState("16");
   const [minute, setMinute] = useState("00");
+  const [disabled, setDisabled] = useState(false);
+
+  useEffect(() => {
+    const timeRegex: RegExp =
+      /^(?:[01][0-9]|2[0-3]):[0-5][0-9](?::[0-5][0-9])?$/;
+    const timeString = `${formatTime(hour)}:${formatTime(minute)}`;
+    const validTime = timeRegex.test(timeString);
+    setDisabled(!validTime);
+  }, [hour, minute]);
 
   useEffect(() => {
     const savedTime = Storage.getItemSync("notificationTime");
@@ -37,20 +46,16 @@ export default function TimeSelectModal({
     }
   }, []);
 
-  const formatTime = (time: string, maxTime: number) => {
+  const formatTime = (time: string) => {
     let formatedTime = time;
     if (time.length < 2) {
       formatedTime = time.padStart(2, "0");
     }
-
-    if (Number(formatedTime) > maxTime) {
-      formatedTime = String(maxTime);
-    }
-    return time;
+    return formatedTime;
   };
 
   const handleSave = () => {
-    onSelect(formatTime(hour, 23), formatTime(minute, 59));
+    onSelect(formatTime(hour), formatTime(minute));
     onClose();
   };
 
@@ -74,6 +79,7 @@ export default function TimeSelectModal({
                 <ThemedInput
                   style={styles.input}
                   keyboardType="numeric"
+                  placeholder="00"
                   maxLength={2}
                   value={hour}
                   onChangeText={setHour}
@@ -85,6 +91,7 @@ export default function TimeSelectModal({
                 <ThemedInput
                   style={styles.input}
                   keyboardType="numeric"
+                  placeholder="00"
                   maxLength={2}
                   value={minute}
                   onChangeText={setMinute}
@@ -98,10 +105,10 @@ export default function TimeSelectModal({
               </ThemedButton>
               <ThemedButton
                 onPress={handleSave}
-                disabled={!hour.trim() || !minute.trim()}
+                disabled={disabled}
                 style={[
                   styles.button,
-                  (!hour.trim() || !minute.trim()) && {
+                  disabled && {
                     opacity: 0.5,
                   },
                 ]}

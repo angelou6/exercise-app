@@ -33,24 +33,24 @@ const App = () => {
 
   useEffect(() => {
     partyPopperAudio.play();
-    const activeStreak = Storage.getItemSync("useStreak");
-    if (!activeStreak) return;
+    const activeStreak = Storage.getItemSync("useStreak") === "true";
+    if (activeStreak) {
+      const todayStr = getTodayString();
+      const lastDayExercised = Storage.getItemSync("lastDayExercised");
 
-    const todayStr = getTodayString();
-    const lastDayExercised = Storage.getItemSync("lastDayExercised");
+      if (lastDayExercised === todayStr) return;
 
-    if (lastDayExercised === todayStr) return;
+      const yesterdayStr = getYesterdayString();
+      const currentStreak = Number(Storage.getItemSync("streak")) || 0;
 
-    const yesterdayStr = getYesterdayString();
-    const currentStreak = Number(Storage.getItemSync("streak")) || 0;
+      if (lastDayExercised === yesterdayStr) {
+        Storage.setItemSync("streak", String(currentStreak + 1));
+      } else {
+        Storage.setItemSync("streak", "1");
+      }
 
-    if (lastDayExercised === yesterdayStr) {
-      Storage.setItemSync("streak", String(currentStreak + 1));
-    } else {
-      Storage.setItemSync("streak", "1");
+      Storage.setItemSync("lastDayExercised", todayStr);
     }
-
-    Storage.setItemSync("lastDayExercised", todayStr);
   }, []);
 
   return (

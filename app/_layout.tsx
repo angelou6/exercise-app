@@ -11,10 +11,10 @@ import {
 } from "expo-sqlite";
 import { StatusBar } from "expo-status-bar";
 import * as SystemUI from "expo-system-ui";
-
+import { setAudioModeAsync } from "expo-audio";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
-import { Suspense } from "react";
+import { Suspense, useEffect } from "react";
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
@@ -22,7 +22,17 @@ export default function RootLayout() {
     colorScheme === "dark" ? Colors.dark.background : Colors.light.background;
   SystemUI.setBackgroundColorAsync(bgColor);
 
-  openDatabaseSync("exercise.db");
+  useEffect(() => {
+    const init = async () => {
+      await setAudioModeAsync({
+        interruptionMode: "duckOthers",
+        playsInSilentMode: false,
+        shouldPlayInBackground: false,
+      });
+    };
+    openDatabaseSync("exercise.db");
+    init();
+  }, []);
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>

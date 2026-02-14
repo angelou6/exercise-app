@@ -10,14 +10,17 @@ import { useEffect, useMemo, useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+const dingAudioSource = require("../../assets/audio/ding.mp3");
+const clickAudioSource = require("../../assets/audio/click.mp3");
+
 const App = () => {
   useKeepAwake();
 
   const { wID, wRest } = useLocalSearchParams();
   const cardTheme = useCardTheme();
 
-  const dingAudio = useAudioPlayer(require("../../assets/audio/ding.mp3"));
-  const clickAudio = useAudioPlayer(require("../../assets/audio/click.mp3"));
+  const dingAudio = useAudioPlayer(dingAudioSource);
+  const clickAudio = useAudioPlayer(clickAudioSource);
 
   if (!wID || !wRest) return router.replace("/");
 

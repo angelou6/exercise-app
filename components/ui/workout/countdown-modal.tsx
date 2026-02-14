@@ -11,14 +11,17 @@ type CountdownModalProps = {
   onClose: () => void;
 };
 
+const clickAudioSource = require("../../../assets/audio/click.mp3");
+const dingAudioSource = require("../../../assets/audio/ding.mp3");
+
 export default function CountdownModal({
   visible,
   duration,
   onClose,
 }: CountdownModalProps) {
   const [timeLeft, setTimeLeft] = useState(duration);
-  const clickAudio = useAudioPlayer(require("../../../assets/audio/click.mp3"));
-  const dingAudio = useAudioPlayer(require("../../../assets/audio/ding.mp3"));
+  const clickAudio = useAudioPlayer(clickAudioSource);
+  const dingAudio = useAudioPlayer(dingAudioSource);
 
   useEffect(() => {
     if (visible) {

@@ -64,8 +64,7 @@ const App = () => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <ThemedText type="title">Exercise App</ThemedText>
-        <View style={styles.rightSide}>
+        <View>
           {useStreak && (
             <View style={styles.streakContainer}>
               <ThemedIcon
@@ -154,14 +153,10 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "flex-end",
     alignItems: "center",
     paddingHorizontal: 20,
     paddingVertical: 15,
-  },
-  rightSide: {
-    flexDirection: "row",
-    gap: 20,
   },
   streakContainer: {
     flexDirection: "row",

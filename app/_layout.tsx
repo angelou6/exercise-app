@@ -1,8 +1,11 @@
+import { Colors } from "@/constants/theme";
+import { useColorScheme } from "@/hooks/use-color-scheme";
 import {
   DarkTheme,
   DefaultTheme,
   ThemeProvider,
 } from "@react-navigation/native";
+import { setAudioModeAsync } from "expo-audio";
 import { Stack } from "expo-router";
 import {
   SQLiteProvider,
@@ -11,9 +14,6 @@ import {
 } from "expo-sqlite";
 import { StatusBar } from "expo-status-bar";
 import * as SystemUI from "expo-system-ui";
-import { setAudioModeAsync } from "expo-audio";
-import { Colors } from "@/constants/theme";
-import { useColorScheme } from "@/hooks/use-color-scheme";
 import { Suspense, useEffect } from "react";
 
 export default function RootLayout() {

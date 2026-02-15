@@ -1,3 +1,4 @@
+import { ExternalLink } from "@/components/external-link";
 import { ThemedIcon, ThemedText } from "@/components/themed";
 import RadioSelectModal from "@/components/ui/settings/radio-select-modal";
 import TimeSelectModal from "@/components/ui/settings/time-select-modal";
@@ -200,6 +201,20 @@ const App = () => {
             text="Send Notifications"
           />
         </View>
+        <ExternalLink
+          style={[
+            styles.card,
+            styles.externalLink,
+            {
+              backgroundColor: cardTheme.background,
+              borderColor: cardTheme.border,
+            },
+          ]}
+          href="https://github.com/angelou6/exercise-app"
+        >
+          <ThemedIcon name="Github" />
+          <ThemedText>Github</ThemedText>
+        </ExternalLink>
 
         {reminder && (
           <Pressable onPress={() => setTimeModalVisible(true)}>
@@ -254,6 +269,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+  },
+  externalLink: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
   },
   valueContainer: {
     flexDirection: "row",

@@ -4,7 +4,7 @@ export default {
   expo: {
     name: "Exercise App",
     slug: "exercise-app",
-    version: "0.2.1",
+    version: "0.2.3",
     orientation: "portrait",
     icon: "./assets/images/icon.png",
     scheme: "exerciseapp",

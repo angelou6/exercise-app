@@ -66,27 +66,25 @@ const App = () => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <View>
-          {useStreak && (
-            <View style={styles.streakContainer}>
-              <ThemedIcon
-                name="Flame"
-                color={
-                  streak > 0
-                    ? "red"
-                    : theme === "light"
-                      ? Colors.light.icon
-                      : Colors.dark.icon
-                }
-                size={24}
-              />
-              <ThemedText>{streak}</ThemedText>
-            </View>
-          )}
-          <Pressable onPress={() => router.push("/settings")}>
-            <ThemedIcon name="Settings" size={24} />
-          </Pressable>
-        </View>
+        {useStreak && (
+          <View style={styles.streakContainer}>
+            <ThemedIcon
+              name="Flame"
+              color={
+                streak > 0
+                  ? "red"
+                  : theme === "light"
+                    ? Colors.light.icon
+                    : Colors.dark.icon
+              }
+              size={24}
+            />
+            <ThemedText type="defaultSemiBold">{streak}</ThemedText>
+          </View>
+        )}
+        <Pressable onPress={() => router.push("/settings")}>
+          <ThemedIcon name="Settings" size={24} />
+        </Pressable>
       </View>
       <ScrollView style={styles.content}>
         <View style={styles.section}>
@@ -158,7 +156,8 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
     alignItems: "center",
     paddingHorizontal: 20,
-    paddingVertical: 15,
+    paddingVertical: 20,
+    gap: 14,
   },
   streakContainer: {
     flexDirection: "row",

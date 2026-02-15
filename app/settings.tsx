@@ -218,21 +218,6 @@ const App = () => {
             text={t("settings.sendNotifications")}
           />
         </View>
-        <ExternalLink
-          style={[
-            styles.card,
-            styles.externalLink,
-            {
-              backgroundColor: cardTheme.background,
-              borderColor: cardTheme.border,
-            },
-          ]}
-          href="https://github.com/angelou6/exercise-app"
-        >
-          <ThemedIcon name="Github" />
-          <ThemedText>{t("settings.github")}</ThemedText>
-        </ExternalLink>
-
         {reminder && (
           <Pressable onPress={() => setTimeModalVisible(true)}>
             <View
@@ -258,6 +243,20 @@ const App = () => {
             </View>
           </Pressable>
         )}
+        <ExternalLink
+          style={[
+            styles.card,
+            styles.externalLink,
+            {
+              backgroundColor: cardTheme.background,
+              borderColor: cardTheme.border,
+            },
+          ]}
+          href="https://github.com/angelou6/exercise-app"
+        >
+          <ThemedIcon name="Github" />
+          <ThemedText>{t("settings.github")}</ThemedText>
+        </ExternalLink>
       </ScrollView>
     </SafeAreaView>
   );

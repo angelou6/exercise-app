@@ -11,6 +11,7 @@ import {
 import { type Exercise, type SubmitExercise } from "@/utils/databaseTypes";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   ListRenderItemInfo,
   Pressable,
@@ -26,6 +27,7 @@ import ReorderableList, {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const App = () => {
+  const { t } = useTranslation();
   const { wID, wEmoji, wName, wRest } = useLocalSearchParams();
   const cardTheme = useCardTheme();
 
@@ -139,7 +141,9 @@ const App = () => {
               <View style={styles.emptyContainer}>
                 <View style={styles.emptyCard}>
                   <ThemedIcon name="ListPlus" size={48} variant="dimmed" />
-                  <ThemedText type="subtitle">No Exercises</ThemedText>
+                  <ThemedText type="subtitle">
+                    {t("exercise.noExercises")}
+                  </ThemedText>
                 </View>
               </View>
             }
@@ -149,7 +153,9 @@ const App = () => {
                 style={styles.addExerciseButton}
               >
                 <ThemedIcon name="Plus" />
-                <ThemedText type="defaultSemiBold">Add Exercise</ThemedText>
+                <ThemedText type="defaultSemiBold">
+                  {t("exercise.addExercise")}
+                </ThemedText>
               </Pressable>
             }
             renderItem={({ item }: ListRenderItemInfo<SubmitExercise>) => (
@@ -175,7 +181,9 @@ const App = () => {
               disabled={!name.trim() || exercises.length === 0}
             >
               <ThemedIcon name="Save" size={20} />
-              <Text style={styles.saveButtonText}>Update Workout</Text>
+              <Text style={styles.saveButtonText}>
+                {t("workout.updateWorkout")}
+              </Text>
             </ThemedButton>
           ) : (
             <ThemedButton
@@ -187,7 +195,9 @@ const App = () => {
               disabled={!name.trim() || exercises.length === 0}
             >
               <ThemedIcon name="Check" size={20} />
-              <Text style={styles.saveButtonText}>Save Workout</Text>
+              <Text style={styles.saveButtonText}>
+                {t("workout.saveWorkout")}
+              </Text>
             </ThemedButton>
           )}
         </View>

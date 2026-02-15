@@ -5,12 +5,14 @@ import { useAudioPlayer } from "expo-audio";
 import { router, useLocalSearchParams } from "expo-router";
 import { Storage } from "expo-sqlite/kv-store";
 import { useEffect, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const partyPopperSource = require("../../assets/audio/partypopper.mp3");
 
 const App = () => {
+  const { t } = useTranslation();
   const { wID } = useLocalSearchParams();
   const partyPopperAudio = useAudioPlayer(partyPopperSource);
 
@@ -67,17 +69,17 @@ const App = () => {
           )}
         </View>
         <ThemedText style={styles.title} type="title">
-          Workout Complete!
+          {t("workout.workoutComplete")}
         </ThemedText>
         <View style={styles.actions}>
           <ThemedButton onPress={handleRestart}>
             <ThemedIcon name="RotateCcw" size={20} />
-            <Text>Restart</Text>
+            <Text>{t("workout.restart")}</Text>
           </ThemedButton>
 
           <ThemedButton onPress={handleGoHome}>
             <ThemedIcon name="Home" size={20} />
-            <Text>Back to Home</Text>
+            <Text>{t("workout.backToHome")}</Text>
           </ThemedButton>
         </View>
       </View>

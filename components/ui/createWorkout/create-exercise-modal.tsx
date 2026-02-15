@@ -12,6 +12,7 @@ import {
 } from "@/utils/database";
 import { Exercise } from "@/utils/databaseTypes";
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Modal,
   Pressable,
@@ -34,6 +35,7 @@ export default function CreateExerciseModal({
   initialExercise,
   onExerciseChange,
 }: CreateExerciseModalProps) {
+  const { t } = useTranslation();
   const backgroundColor = useThemeColor({}, "background");
 
   const [name, setName] = useState("");
@@ -82,7 +84,9 @@ export default function CreateExerciseModal({
           <View style={[styles.container, { backgroundColor }]}>
             <View style={styles.header}>
               <ThemedText type="subtitle">
-                {initialExercise ? "Edit Exercise" : "Create Exercise"}
+                {initialExercise
+                  ? t("exercise.editExercise")
+                  : t("exercise.createExercise")}
               </ThemedText>
               <Pressable onPress={onClose}>
                 <ThemedIcon name="X" size={24} />
@@ -91,21 +95,25 @@ export default function CreateExerciseModal({
 
             <View style={styles.form}>
               <View style={styles.formGroup}>
-                <ThemedText style={styles.label}>Exercise Name</ThemedText>
+                <ThemedText style={styles.label}>
+                  {t("exercise.exerciseName")}
+                </ThemedText>
                 <ThemedInput
                   value={name}
                   onChangeText={setName}
                   style={styles.input}
-                  placeholder="Enter exercise name"
+                  placeholder={t("exercise.enterExerciseName")}
                 />
               </View>
               <View style={styles.formGroup}>
-                <ThemedText style={styles.label}>Description</ThemedText>
+                <ThemedText style={styles.label}>
+                  {t("exercise.exerciseDescription")}
+                </ThemedText>
                 <ThemedInput
                   value={desc}
                   onChangeText={setDesc}
                   style={[styles.input, styles.textArea]}
-                  placeholder="Enter exercise description"
+                  placeholder={t("exercise.enterExerciseDescription")}
                   multiline
                 />
               </View>
@@ -119,7 +127,9 @@ export default function CreateExerciseModal({
                 onPress={handleSubmit}
               >
                 <Text>
-                  {initialExercise ? "Update Exercise" : "Add Exercise"}
+                  {initialExercise
+                    ? t("exercise.updateExercise")
+                    : t("exercise.addExercise")}
                 </Text>
               </ThemedButton>
               {initialExercise && (
@@ -127,7 +137,7 @@ export default function CreateExerciseModal({
                   onPress={handleDelete}
                   style={styles.deleteButton}
                 >
-                  <ThemedText>Delete Exercise</ThemedText>
+                  <ThemedText>{t("exercise.deleteExercise")}</ThemedText>
                 </ThemedButton>
               )}
             </View>

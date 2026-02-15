@@ -1,0 +1,72 @@
+{
+  "common": {
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete"
+  },
+  "home": {
+    "noWorkouts": "No Workouts",
+    "createWorkout": "Create Workout"
+  },
+  "settings": {
+    "title": "Settings",
+    "theme": "Theme",
+    "themeOptions": {
+      "system": "System",
+      "light": "Light",
+      "dark": "Dark"
+    },
+    "streak": "Streak",
+    "sendNotifications": "Send Notifications",
+    "time": "Time",
+    "selectTime": "Select Time",
+    "hour": "Hour",
+    "minute": "Minute",
+    "github": "Github",
+    "notifications": {
+      "permissionDenied": "Permission for notifications not granted!",
+      "rejected": "Notification rejected",
+      "dailyTitle": "Daily Reminder",
+      "dailyBody": "Workout time!",
+      "setFor": "Notification set for {{time}}",
+      "removed": "Removed daily notification"
+    }
+  },
+  "createWorkout": {
+    "title": "Create Workout",
+    "workoutNamePlaceholder": "Workout Name",
+    "restBetweenExercises": "Rest between exercises"
+  },
+  "exercise": {
+    "selectExercises": "Select Exercises",
+    "searchExercises": "Search exercises...",
+    "noExercises": "No Exercises",
+    "deleteExerciseTitle": "Delete Exercise",
+    "deleteExerciseConfirm": "Are you sure you want to delete {{name}}?",
+    "createExercise": "Create Exercise",
+    "editExercise": "Edit Exercise",
+    "exerciseName": "Exercise Name",
+    "exerciseDescription": "Description",
+    "enterExerciseName": "Enter exercise name",
+    "enterExerciseDescription": "Enter exercise description",
+    "updateExercise": "Update Exercise",
+    "addExercise": "Add Exercise",
+    "deleteExercise": "Delete Exercise"
+  },
+  "workout": {
+    "noExercises": "No Exercises",
+    "updateWorkout": "Update Workout",
+    "saveWorkout": "Save Workout",
+    "startWorkout": "Start Workout",
+    "deleteWorkoutTitle": "Delete Workout",
+    "deleteWorkoutConfirm": "Are you sure you want to delete \"{{name}}\"?",
+    "restBetween": "{{seconds}}s rest between exercises",
+    "totalTime": "{{minutes}}:{{seconds}} total",
+    "exerciseCount": "{{count}} exercises",
+    "restTime": "Rest Time",
+    "upNext": "Up Next: {{name}}",
+    "workoutComplete": "Workout Complete!",
+    "restart": "Restart",
+    "backToHome": "Back to Home"
+  }
+}

@@ -11,6 +11,7 @@ import { SubmitExercise, type Exercise } from "@/utils/databaseTypes";
 import { useFocusEffect } from "expo-router";
 import Fuse from "fuse.js";
 import React, { useCallback, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Alert,
   FlatList,
@@ -37,6 +38,7 @@ export default function AddExerciseModal({
   removeExercise,
   selected,
 }: exerciseSelect) {
+  const { t } = useTranslation();
   const defaultIconSize = 22;
 
   const [exercises, setExercises] = useState<Exercise[]>([]);
@@ -120,7 +122,7 @@ export default function AddExerciseModal({
         onExerciseChange={handleExerciseChange}
       />
       <View style={styles.header}>
-        <ThemedText type="title">Select Exercises</ThemedText>
+        <ThemedText type="title">{t("exercise.selectExercises")}</ThemedText>
         <Pressable onPress={onClose}>
           <ThemedIcon name="Check" />
         </Pressable>
@@ -129,7 +131,7 @@ export default function AddExerciseModal({
         <ThemedIcon name="Search" size={20} variant="dimmed" />
         <ThemedInput
           style={styles.searchInput}
-          placeholder="Search exercises..."
+          placeholder={t("exercise.searchExercises")}
           onChangeText={(text) => {
             const results = fuse.search(text);
             setFuzzyExercises(results.map((r) => r.item));
@@ -144,7 +146,9 @@ export default function AddExerciseModal({
           <View style={styles.emptyContainer}>
             <View style={styles.emptyCard}>
               <ThemedIcon name="Dumbbell" size={48} variant="dimmed" />
-              <ThemedText type="subtitle">No Exercises</ThemedText>
+              <ThemedText type="subtitle">
+                {t("exercise.noExercises")}
+              </ThemedText>
             </View>
           </View>
         }
@@ -158,14 +162,14 @@ export default function AddExerciseModal({
               <View style={styles.selectionIndicator}>
                 {isSelected ? (
                   <ThemedIcon
-                    name="CheckCircle2"
+                    name="SquareCheck"
                     color={tintColor}
                     size={defaultIconSize}
                   />
                 ) : (
                   <ThemedIcon
                     variant="dimmed"
-                    name="Circle"
+                    name="Square"
                     color={tintColor}
                     size={defaultIconSize}
                   />
@@ -173,7 +177,16 @@ export default function AddExerciseModal({
               </View>
 
               <View style={styles.cardText}>
-                <ThemedText type="defaultSemiBold">{item.name}</ThemedText>
+                <ThemedText
+                  type="defaultSemiBold"
+                  style={
+                    !isSelected && {
+                      opacity: 0.8,
+                    }
+                  }
+                >
+                  {item.name}
+                </ThemedText>
                 {item.description && item.description.length > 0 && (
                   <ThemedText type="subtitle" style={styles.exerciseDesc}>
                     {item.description}
@@ -183,12 +196,12 @@ export default function AddExerciseModal({
               <Pressable
                 onPress={() => {
                   Alert.alert(
-                    "Delete Exercise",
-                    `Are you sure you want to delete ${item.name}?`,
+                    t("exercise.deleteExerciseTitle"),
+                    t("exercise.deleteExerciseConfirm", { name: item.name }),
                     [
-                      { text: "Cancel", style: "cancel" },
+                      { text: t("common.cancel"), style: "cancel" },
                       {
-                        text: "Delete",
+                        text: t("common.delete"),
                         style: "destructive",
                         onPress: () => {
                           handleDeleteExercise(item.id);
@@ -216,7 +229,7 @@ export default function AddExerciseModal({
           }}
         >
           <ThemedIcon name="Plus" />
-          <Text>Add Exercise</Text>
+          <Text>{t("exercise.addExercise")}</Text>
         </ThemedButton>
       </View>
     </ThemedModal>

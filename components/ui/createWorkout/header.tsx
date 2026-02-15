@@ -8,6 +8,7 @@ import { CardTheme } from "@/constants/theme";
 import { validateNumberInput } from "@/utils/input";
 import { router } from "expo-router";
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { EmojiType } from "rn-emoji-keyboard";
 
@@ -30,6 +31,7 @@ export default function WorkoutHeader({
   setRestTime,
   cardTheme,
 }: Header) {
+  const { t } = useTranslation();
   const defaultRestTime = 5;
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
@@ -48,7 +50,7 @@ export default function WorkoutHeader({
         <Pressable onPress={() => router.back()} style={styles.backButton}>
           <ThemedIcon name="ArrowLeft" />
         </Pressable>
-        <ThemedText type="title">Create Workout</ThemedText>
+        <ThemedText type="title">{t("createWorkout.title")}</ThemedText>
       </View>
 
       <View
@@ -73,12 +75,12 @@ export default function WorkoutHeader({
             scrollEnabled={true}
             onChangeText={setName}
             style={styles.workoutName}
-            placeholder="Workout Name"
+            placeholder={t("createWorkout.workoutNamePlaceholder")}
           />
         </View>
 
         <View style={styles.restRow}>
-          <ThemedText>Rest between exercises</ThemedText>
+          <ThemedText>{t("createWorkout.restBetweenExercises")}</ThemedText>
           <View style={styles.restInputContainer}>
             <ThemedInput
               keyboardType="numeric"

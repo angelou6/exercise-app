@@ -4,6 +4,7 @@ import { ThemedText } from "@/components/themed/themed-text";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import Storage from "expo-sqlite/kv-store";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Modal,
   Pressable,
@@ -24,6 +25,7 @@ export default function TimeSelectModal({
   onClose,
   onSelect,
 }: TimeSelectModalProps) {
+  const { t } = useTranslation();
   const backgroundColor = useThemeColor({}, "background");
   const [hour, setHour] = useState("16");
   const [minute, setMinute] = useState("00");
@@ -70,12 +72,12 @@ export default function TimeSelectModal({
         <TouchableWithoutFeedback>
           <View style={[styles.modalContent, { backgroundColor }]}>
             <ThemedText type="subtitle" style={styles.title}>
-              Select Time
+              {t("settings.selectTime")}
             </ThemedText>
 
             <View style={styles.inputContainer}>
               <View style={styles.inputWrapper}>
-                <ThemedText>Hour</ThemedText>
+                <ThemedText>{t("settings.hour")}</ThemedText>
                 <ThemedInput
                   style={styles.input}
                   keyboardType="numeric"
@@ -87,7 +89,7 @@ export default function TimeSelectModal({
               </View>
               <ThemedText style={styles.separator}>:</ThemedText>
               <View style={styles.inputWrapper}>
-                <ThemedText>Minute</ThemedText>
+                <ThemedText>{t("settings.minute")}</ThemedText>
                 <ThemedInput
                   style={styles.input}
                   keyboardType="numeric"
@@ -101,7 +103,7 @@ export default function TimeSelectModal({
 
             <View style={styles.buttonContainer}>
               <ThemedButton onPress={onClose} style={styles.button}>
-                <Text>Cancel</Text>
+                <Text>{t("common.cancel")}</Text>
               </ThemedButton>
               <ThemedButton
                 onPress={handleSave}
@@ -113,7 +115,7 @@ export default function TimeSelectModal({
                   },
                 ]}
               >
-                <Text>Save</Text>
+                <Text>{t("common.save")}</Text>
               </ThemedButton>
             </View>
           </View>

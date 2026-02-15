@@ -4,6 +4,7 @@ import { getOneExercise } from "@/utils/database";
 import { Exercise, SubmitExercise } from "@/utils/databaseTypes";
 import { validateNumberInput } from "@/utils/input";
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Pressable, StyleSheet, View } from "react-native";
 import { useReorderableDrag } from "react-native-reorderable-list";
 import CreateExerciseModal from "./create-exercise-modal";
@@ -25,6 +26,7 @@ export default function DragableItem({
   deleteExercise,
   onExerciseUpdate,
 }: Item) {
+  const { t } = useTranslation();
   const drag = useReorderableDrag();
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const [exTime, setExTime] = useState("");

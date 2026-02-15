@@ -9,6 +9,7 @@ import * as Notifications from "expo-notifications";
 import { router } from "expo-router";
 import Storage from "expo-sqlite/kv-store";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Pressable,
   ScrollView,
@@ -27,29 +28,8 @@ Notifications.setNotificationHandler({
   }),
 });
 
-async function scheduleDailyNotification(hour: number, minute: number) {
-  const { status } = await Notifications.requestPermissionsAsync();
-  if (status !== "granted") {
-    alert("Permission for notifications not granted!");
-    throw new Error("Notification rejected");
-  }
-
-  await Notifications.cancelAllScheduledNotificationsAsync();
-
-  await Notifications.scheduleNotificationAsync({
-    content: {
-      title: "Daily Reminder",
-      body: "Workout time!",
-    },
-    trigger: {
-      type: Notifications.SchedulableTriggerInputTypes.DAILY,
-      hour: hour,
-      minute: minute,
-    },
-  });
-}
-
 const App = () => {
+  const { t } = useTranslation();
   const [useStreak, setUseStreak] = useState(false);
   const [reminder, setReminder] = useState(false);
   const cardTheme = useCardTheme();
@@ -57,7 +37,11 @@ const App = () => {
   const [timeModalVisible, setTimeModalVisible] = useState(false);
   const { themePreference, setTheme } = useThemeStrategy();
   const [themeModalVisible, setThemeModalVisible] = useState(false);
-  const themeOptions = ["System", "Light", "Dark"];
+  const themeOptions = [
+    t("settings.themeOptions.system"),
+    t("settings.themeOptions.light"),
+    t("settings.themeOptions.dark"),
+  ];
   const themeValues: ("system" | "light" | "dark")[] = [
     "system",
     "light",
@@ -68,12 +52,42 @@ const App = () => {
     minute: "00",
   });
 
+  const themeLabels: Record<string, string> = {
+    system: t("settings.themeOptions.system"),
+    light: t("settings.themeOptions.light"),
+    dark: t("settings.themeOptions.dark"),
+  };
+
+  const scheduleDailyNotification = async (hour: number, minute: number) => {
+    const { status } = await Notifications.requestPermissionsAsync();
+    if (status !== "granted") {
+      alert(t("settings.notifications.permissionDenied"));
+      throw new Error(t("settings.notifications.rejected"));
+    }
+
+    await Notifications.cancelAllScheduledNotificationsAsync();
+
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: t("settings.notifications.dailyTitle"),
+        body: t("settings.notifications.dailyBody"),
+      },
+      trigger: {
+        type: Notifications.SchedulableTriggerInputTypes.DAILY,
+        hour: hour,
+        minute: minute,
+      },
+    });
+  };
+
   const handleNotification = async (hour: string, minute: string) => {
     try {
       await scheduleDailyNotification(Number(hour), Number(minute));
       setReminderTime({ hour, minute });
       ToastAndroid.show(
-        `Notification set for ${hour}:${minute}`,
+        t("settings.notifications.setFor", {
+          time: `${hour}:${minute}`,
+        }),
         ToastAndroid.SHORT,
       );
       return true;
@@ -91,7 +105,10 @@ const App = () => {
       setReminder(success);
     } else {
       await Notifications.cancelAllScheduledNotificationsAsync();
-      ToastAndroid.show("Removed daily notification", ToastAndroid.SHORT);
+      ToastAndroid.show(
+        t("settings.notifications.removed"),
+        ToastAndroid.SHORT,
+      );
       setReminder(false);
     }
   };
@@ -144,7 +161,7 @@ const App = () => {
         <Pressable onPress={() => router.back()}>
           <ThemedIcon name="ArrowLeft" size={24} />
         </Pressable>
-        <ThemedText type="title">Ajustes</ThemedText>
+        <ThemedText type="title">{t("settings.title")}</ThemedText>
       </View>
 
       <ScrollView style={styles.content}>
@@ -159,10 +176,10 @@ const App = () => {
             ]}
           >
             <View style={styles.cardContent}>
-              <ThemedText style={{ flex: 1 }}>Theme</ThemedText>
+              <ThemedText style={{ flex: 1 }}>{t("settings.theme")}</ThemedText>
               <View style={styles.valueContainer}>
                 <ThemedText style={styles.valueText}>
-                  {themePreference}
+                  {themeLabels[themePreference] ?? themePreference}
                 </ThemedText>
                 <ThemedIcon name="ChevronRight" size={20} color="#888" />
               </View>
@@ -182,7 +199,7 @@ const App = () => {
           <ToggleButton
             onSelect={setUseStreak}
             defaultValue={useStreak}
-            text="Streak"
+            text={t("settings.streak")}
           />
         </View>
 
@@ -198,7 +215,7 @@ const App = () => {
           <ToggleButton
             onSelect={handleActivateNotifications}
             defaultValue={reminder}
-            text="Send Notifications"
+            text={t("settings.sendNotifications")}
           />
         </View>
         <ExternalLink
@@ -213,7 +230,7 @@ const App = () => {
           href="https://github.com/angelou6/exercise-app"
         >
           <ThemedIcon name="Github" />
-          <ThemedText>Github</ThemedText>
+          <ThemedText>{t("settings.github")}</ThemedText>
         </ExternalLink>
 
         {reminder && (
@@ -228,7 +245,9 @@ const App = () => {
               ]}
             >
               <View style={styles.cardContent}>
-                <ThemedText style={{ flex: 1 }}>Time</ThemedText>
+                <ThemedText style={{ flex: 1 }}>
+                  {t("settings.time")}
+                </ThemedText>
                 <View style={styles.valueContainer}>
                   <ThemedText style={styles.valueText}>
                     {reminderTime.hour}:{reminderTime.minute}

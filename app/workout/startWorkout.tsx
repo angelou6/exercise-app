@@ -7,6 +7,7 @@ import {
 } from "@/utils/database";
 import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import { useCallback, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Alert,
   Pressable,
@@ -18,6 +19,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const App = () => {
+  const { t } = useTranslation();
   const { workoutID } = useLocalSearchParams();
   const cardTheme = useCardTheme();
 
@@ -43,14 +45,19 @@ const App = () => {
     totalTime = totalDuration + (exercises.length - 1) * workout.rest;
   }
 
+  const totalTimeLabel = t("workout.totalTime", {
+    minutes: Math.floor(totalTime / 60),
+    seconds: (totalTime % 60).toString().padStart(2, "0"),
+  });
+
   const handleDelete = () => {
     Alert.alert(
-      "Delete Workout",
-      `Are you sure you want to delete "${workout?.name}"?`,
+      t("workout.deleteWorkoutTitle"),
+      t("workout.deleteWorkoutConfirm", { name: workout?.name ?? "" }),
       [
-        { text: "Cancel", style: "cancel" },
+        { text: t("common.cancel"), style: "cancel" },
         {
-          text: "Delete",
+          text: t("common.delete"),
           style: "destructive",
           onPress: () => {
             deleteWorkout(Number(workoutID));
@@ -117,14 +124,15 @@ const App = () => {
                 <View style={styles.stat}>
                   <ThemedIcon name="Timer" size={16} variant="dimmed" />
                   <ThemedText type="dimmed" style={styles.statText}>
-                    {Math.floor(totalTime / 60)}:
-                    {(totalTime % 60).toString().padStart(2, "0")} total
+                    {totalTimeLabel}
                   </ThemedText>
                 </View>
                 <View style={styles.stat}>
                   <ThemedIcon name="Dumbbell" size={16} variant="dimmed" />
                   <ThemedText type="dimmed" style={styles.statText}>
-                    {exercises.length} exercises
+                    {t("workout.exerciseCount", {
+                      count: exercises.length,
+                    })}
                   </ThemedText>
                 </View>
               </View>
@@ -136,7 +144,7 @@ const App = () => {
           >
             <ThemedIcon name="Clock" size={16} variant="dimmed" />
             <ThemedText type="dimmed" style={styles.restText}>
-              {workout.rest}s rest between exercises
+              {t("workout.restBetween", { seconds: workout.rest })}
             </ThemedText>
           </View>
         </View>
@@ -159,7 +167,7 @@ const App = () => {
                 <View style={styles.exerciseMeta}>
                   <ThemedIcon name="Timer" size={14} variant="dimmed" />
                   <ThemedText type="dimmed" style={styles.durationText}>
-                    {exercise.duration}s
+                    {`${exercise.duration}s`}
                   </ThemedText>
                 </View>
               </View>
@@ -177,7 +185,7 @@ const App = () => {
           ]}
         >
           <ThemedIcon name="Play" size={24} />
-          <Text>Start Workout</Text>
+          <Text>{t("workout.startWorkout")}</Text>
         </ThemedButton>
       </View>
     </SafeAreaView>

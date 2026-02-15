@@ -1,0 +1,72 @@
+{
+  "common": {
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "delete": "Eliminar"
+  },
+  "home": {
+    "noWorkouts": "Sin entrenamientos",
+    "createWorkout": "Crear entrenamiento"
+  },
+  "settings": {
+    "title": "Ajustes",
+    "theme": "Tema",
+    "themeOptions": {
+      "system": "Sistema",
+      "light": "Claro",
+      "dark": "Oscuro"
+    },
+    "streak": "Racha",
+    "sendNotifications": "Enviar notificaciones",
+    "time": "Hora",
+    "selectTime": "Seleccionar hora",
+    "hour": "Hora",
+    "minute": "Minuto",
+    "github": "Github",
+    "notifications": {
+      "permissionDenied": "No se concedio el permiso para notificaciones",
+      "rejected": "Notificacion rechazada",
+      "dailyTitle": "Recordatorio diario",
+      "dailyBody": "Hora de entrenar",
+      "setFor": "Notificacion programada para {{time}}",
+      "removed": "Notificacion diaria eliminada"
+    }
+  },
+  "createWorkout": {
+    "title": "Crear Entrenamiento",
+    "workoutNamePlaceholder": "Entrenamiento",
+    "restBetweenExercises": "Descanso entre ejercicios"
+  },
+  "exercise": {
+    "selectExercises": "Seleccionar ejercicios",
+    "searchExercises": "Buscar ejercicios...",
+    "noExercises": "Sin ejercicios",
+    "deleteExerciseTitle": "Eliminar ejercicio",
+    "deleteExerciseConfirm": "Seguro que quieres eliminar {{name}}?",
+    "createExercise": "Crear ejercicio",
+    "editExercise": "Editar ejercicio",
+    "exerciseName": "Nombre del ejercicio",
+    "exerciseDescription": "Descripcion",
+    "enterExerciseName": "Introduce el nombre del ejercicio",
+    "enterExerciseDescription": "Introduce la descripcion del ejercicio",
+    "updateExercise": "Actualizar ejercicio",
+    "addExercise": "Agregar ejercicio",
+    "deleteExercise": "Eliminar ejercicio"
+  },
+  "workout": {
+    "noExercises": "Sin ejercicios",
+    "updateWorkout": "Actualizar entrenamiento",
+    "saveWorkout": "Guardar entrenamiento",
+    "startWorkout": "Empezar entrenamiento",
+    "deleteWorkoutTitle": "Eliminar entrenamiento",
+    "deleteWorkoutConfirm": "Seguro que quieres eliminar \"{{name}}\"?",
+    "restBetween": "{{seconds}}s de descanso entre ejercicios",
+    "totalTime": "{{minutes}}:{{seconds}} total",
+    "exerciseCount": "{{count}} ejercicios",
+    "restTime": "Tiempo de descanso",
+    "upNext": "Siguiente: {{name}}",
+    "workoutComplete": "Entrenamiento completado",
+    "restart": "Reiniciar",
+    "backToHome": "Volver al inicio"
+  }
+}

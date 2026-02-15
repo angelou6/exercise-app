@@ -1,5 +1,6 @@
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import i18nInit from "@/utils/language/i18nextConfig";
 import {
   DarkTheme,
   DefaultTheme,
@@ -30,6 +31,7 @@ export default function RootLayout() {
         shouldPlayInBackground: false,
       });
     };
+    i18nInit();
     openDatabaseSync("exercise.db");
     init();
   }, []);

@@ -8,10 +8,12 @@ import { getTodayString, getYesterdayString } from "@/utils/streakUtils";
 import { router, useFocusEffect } from "expo-router";
 import { Storage } from "expo-sqlite/kv-store";
 import React, { useCallback, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const App = () => {
+  const { t } = useTranslation();
   const theme = useColorScheme() ?? "light";
 
   const cardTheme = useCardTheme();
@@ -128,7 +130,7 @@ const App = () => {
             <View style={styles.emptyContainer}>
               <View style={styles.emptyCard}>
                 <ThemedIcon name="Dumbbell" size={48} variant="dimmed" />
-                <ThemedText type="subtitle">No Workouts</ThemedText>
+                <ThemedText type="subtitle">{t("home.noWorkouts")}</ThemedText>
               </View>
             </View>
           )}
@@ -140,7 +142,7 @@ const App = () => {
           style={styles.addButton}
         >
           <ThemedIcon name="Plus" size={24} />
-          <Text>Create Workout</Text>
+          <Text>{t("home.createWorkout")}</Text>
         </ThemedButton>
       </View>
     </SafeAreaView>

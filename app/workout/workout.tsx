@@ -7,6 +7,7 @@ import { useAudioPlayer } from "expo-audio";
 import { useKeepAwake } from "expo-keep-awake";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Pressable, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -14,6 +15,7 @@ const dingAudioSource = require("../../assets/audio/ding.mp3");
 const clickAudioSource = require("../../assets/audio/click.mp3");
 
 const App = () => {
+  const { t } = useTranslation();
   useKeepAwake();
 
   const { wID, wRest } = useLocalSearchParams();
@@ -156,10 +158,12 @@ const App = () => {
             </View>
           ) : (
             <View style={styles.exerciseContainer}>
-              <ThemedText type="title">Rest Time</ThemedText>
+              <ThemedText type="title">{t("workout.restTime")}</ThemedText>
               <ThemedText type="dimmed">
-                {exerciseIndex <= exercises.length
-                  ? "Up Next: " + exercises[exerciseIndex + 1].exercise.name
+                {exerciseIndex + 1 < exercises.length
+                  ? t("workout.upNext", {
+                      name: exercises[exerciseIndex + 1].exercise.name,
+                    })
                   : ""}
               </ThemedText>
             </View>

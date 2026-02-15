@@ -7,7 +7,7 @@ import {
 } from "@/components/themed";
 import { Colors } from "@/constants/theme";
 import { deleteExercise, getAllExercises } from "@/utils/database";
-import { SubmitExercise, type Exercise } from "@/utils/databaseTypes";
+import { Exercise, SubmitExercise } from "@/utils/databaseTypes";
 import { useFocusEffect } from "expo-router";
 import Fuse from "fuse.js";
 import React, { useCallback, useMemo, useState } from "react";

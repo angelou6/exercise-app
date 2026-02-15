@@ -1,4 +1,4 @@
-import { openDatabaseSync, type SQLiteDatabase } from "expo-sqlite";
+import { openDatabaseSync, SQLiteDatabase } from "expo-sqlite";
 import { Exercise, SubmitExercise, Workout } from "./databaseTypes";
 
 let db: SQLiteDatabase | undefined = undefined;

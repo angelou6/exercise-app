@@ -3,8 +3,8 @@ import {
   openBrowserAsync,
   WebBrowserPresentationStyle,
 } from "expo-web-browser";
-import { type ComponentProps, type ReactNode } from "react";
-import { Pressable, TextStyle, type StyleProp } from "react-native";
+import { ComponentProps, ReactNode } from "react";
+import { Pressable, StyleProp, TextStyle } from "react-native";
 
 type Props = Omit<
   ComponentProps<typeof Link>,

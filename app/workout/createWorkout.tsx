@@ -8,7 +8,7 @@ import {
   getExercisesFromWorkout,
   updateWorkout,
 } from "@/utils/database";
-import { type Exercise, type SubmitExercise } from "@/utils/databaseTypes";
+import { Exercise, SubmitExercise } from "@/utils/databaseTypes";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";

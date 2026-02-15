@@ -8,11 +8,7 @@ import {
 } from "@react-navigation/native";
 import { setAudioModeAsync } from "expo-audio";
 import { Stack } from "expo-router";
-import {
-  SQLiteProvider,
-  openDatabaseSync,
-  type SQLiteDatabase,
-} from "expo-sqlite";
+import { openDatabaseSync, SQLiteDatabase, SQLiteProvider } from "expo-sqlite";
 import { StatusBar } from "expo-status-bar";
 import * as SystemUI from "expo-system-ui";
 import { Suspense, useEffect } from "react";

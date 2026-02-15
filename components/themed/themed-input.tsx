@@ -1,12 +1,12 @@
-import { TextInput, type TextInputProps } from 'react-native';
+import { TextInput, TextInputProps } from "react-native";
 
-import { useThemeColor } from '@/hooks/use-theme-color';
+import { useThemeColor } from "@/hooks/use-theme-color";
 
 export type InputProps = TextInputProps & {
-    lightColor?: string;
-    darkColor?: string;
-    lightPlaceholderColor?: string;
-    darkPlaceholderColor?: string;
+  lightColor?: string;
+  darkColor?: string;
+  lightPlaceholderColor?: string;
+  darkPlaceholderColor?: string;
 };
 
 export function ThemedInput({
@@ -17,21 +17,18 @@ export function ThemedInput({
   darkPlaceholderColor,
   ...rest
 }: InputProps) {
-  const color = useThemeColor({ light: lightColor, dark: darkColor }, 'text');
+  const color = useThemeColor({ light: lightColor, dark: darkColor }, "text");
 
   const placeholderColor = useThemeColor(
-    { light: lightPlaceholderColor, dark: darkPlaceholderColor }, 
-    'tabIconDefault'
+    { light: lightPlaceholderColor, dark: darkPlaceholderColor },
+    "tabIconDefault",
   );
 
   return (
     <TextInput
-      style={[
-        { color },
-        style,
-      ]}
-        placeholderTextColor={placeholderColor}
-        {...rest}
+      style={[{ color }, style]}
+      placeholderTextColor={placeholderColor}
+      {...rest}
     />
   );
 }

@@ -6,7 +6,7 @@ import { getExercisesFromWorkout } from "@/utils/database";
 import { useAudioPlayer } from "expo-audio";
 import { useKeepAwake } from "expo-keep-awake";
 import { router, useLocalSearchParams } from "expo-router";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useReducer, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Pressable, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -14,34 +14,98 @@ import { SafeAreaView } from "react-native-safe-area-context";
 const dingAudioSource = require("../../assets/audio/ding.mp3");
 const clickAudioSource = require("../../assets/audio/click.mp3");
 
-const App = () => {
-  const { t } = useTranslation();
+interface ExerciseState {
+  index: number;
+  name: string;
+  description: string;
+  duration: number;
+}
+
+interface Action {
+  type: "next" | "previous" | "init";
+}
+
+const Workout = () => {
   useKeepAwake();
-
-  const { wID, wRest } = useLocalSearchParams();
+  const { t } = useTranslation();
   const cardTheme = useCardTheme();
-
+  const { wID, wRest } = useLocalSearchParams();
   const dingAudio = useAudioPlayer(dingAudioSource);
   const clickAudio = useAudioPlayer(clickAudioSource);
 
-  if (!wID || !wRest) return router.replace("/");
-
-  const restDuration = Number(wRest);
-  const exercises = useMemo(() => getExercisesFromWorkout(Number(wID)), [wID]);
-
   const [inCountdown, setInCountdown] = useState(true);
-  const [exerciseIndex, setExerciseIndex] = useState(0);
+  const exercises = getExercisesFromWorkout(Number(wID));
 
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [duration, setDuration] = useState(0);
+  const getExercise = (
+    state: ExerciseState,
+    direction: "next" | "prev" | "init" = "init",
+  ) => {
+    let dir: number;
 
+    switch (direction) {
+      case "next":
+        dir = 1;
+        break;
+
+      case "prev":
+        dir = -1;
+        break;
+
+      default:
+        dir = 0;
+        break;
+    }
+
+    let newExercise = exercises[state.index + dir];
+
+    return {
+      index: state.index + dir,
+      name: newExercise.exercise.name,
+      description: newExercise.exercise.description,
+      duration: newExercise.duration,
+    };
+  };
+
+  const dispatch = (state: ExerciseState, action: Action) => {
+    const { type } = action;
+    let exercise: ExerciseState;
+
+    switch (type) {
+      case "next":
+        exercise = getExercise(state, "next");
+        break;
+
+      case "previous":
+        exercise = getExercise(state, "prev");
+        break;
+
+      default:
+        exercise = getExercise(state);
+        break;
+    }
+
+    return exercise;
+  };
+
+  const [exercise, exerciseDispatch] = useReducer(
+    dispatch,
+    {
+      index: 0,
+      name: "",
+      description: "",
+      duration: 0,
+    },
+    getExercise,
+  );
+
+  const [timeLeft, setTimeLeft] = useState(exercise.duration);
   const [isExercise, setIsExercise] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(duration);
+
+  const restDuration = Number(wRest);
 
   const handleExerciseFinished = () => {
-    if (exerciseIndex + 1 < exercises.length) {
+    if (exercise.index + 1 < exercises.length) {
       setIsExercise(false);
       setTimeLeft(restDuration);
       dingAudio.seekTo(0);
@@ -64,10 +128,10 @@ const App = () => {
     }
   };
 
-  const changeExercise = (direction: "prev" | "next") => {
-    const nextIndex = exerciseIndex + (direction === "next" ? 1 : -1);
-    setExerciseIndex(nextIndex);
-    setTimeLeft(exercises[nextIndex].duration);
+  const changeExercise = (direction: "previous" | "next") => {
+    const newIndex = exercise.index + (direction === "next" ? 1 : -1);
+    exerciseDispatch({ type: direction });
+    setTimeLeft(exercises[newIndex].duration);
     setIsExercise(true);
   };
 
@@ -78,16 +142,20 @@ const App = () => {
   };
 
   const handlePrevious = () => {
-    if (exerciseIndex > 0) {
+    if (exercise.index > 0) {
       setIsPlaying(false);
-      changeExercise("prev");
+      changeExercise("previous");
     }
   };
 
   const handleNext = () => {
-    if (exerciseIndex + 1 < exercises.length) {
+    if (exercise.index + 1 < exercises.length) {
+      const wasRest = !isExercise;
       setIsPlaying(false);
       changeExercise("next");
+      if (wasRest) {
+        setInCountdown(true);
+      }
     }
   };
 
@@ -98,14 +166,6 @@ const App = () => {
       handleRestFinished();
     }
   };
-
-  useEffect(() => {
-    const currentExercise = exercises[exerciseIndex];
-    setName(currentExercise.exercise.name);
-    setDescription(currentExercise.exercise.description);
-    setDuration(currentExercise.duration);
-    setTimeLeft(currentExercise.duration);
-  }, [exerciseIndex]);
 
   useEffect(() => {
     if (!isPlaying) {
@@ -122,22 +182,26 @@ const App = () => {
   }, [isPlaying, timeLeft, isExercise]);
 
   useEffect(() => {
+    if (!isPlaying) {
+      return;
+    }
+
     if (timeLeft <= 5 && timeLeft > 0) {
       clickAudio.seekTo(0);
       clickAudio.play();
     }
-  }, [timeLeft]);
+  }, [timeLeft, isPlaying]);
 
   return (
     <SafeAreaView style={styles.container}>
       <CountdownModal
         visible={inCountdown}
         setVisible={setInCountdown}
-        duration={5}
-        onClose={() => {
+        initialDuration={5}
+        onClose={useCallback(() => {
           setInCountdown(false);
           setIsPlaying(true);
-        }}
+        }, [])}
       />
       <View style={styles.header}>
         <Pressable onPress={() => router.back()}>
@@ -150,19 +214,19 @@ const App = () => {
           {isExercise ? (
             <View style={styles.exerciseContainer}>
               <ThemedText style={styles.titleText} type="title">
-                {name}
+                {exercise.name}
               </ThemedText>
-              {description ? (
-                <ThemedText type="dimmed">{description}</ThemedText>
+              {exercise.description ? (
+                <ThemedText type="dimmed">{exercise.description}</ThemedText>
               ) : null}
             </View>
           ) : (
             <View style={styles.exerciseContainer}>
               <ThemedText type="title">{t("workout.restTime")}</ThemedText>
               <ThemedText type="dimmed">
-                {exerciseIndex + 1 < exercises.length
+                {exercise.index + 1 < exercises.length
                   ? t("workout.upNext", {
-                      name: exercises[exerciseIndex + 1].exercise.name,
+                      name: exercises[exercise.index + 1].exercise.name,
                     })
                   : ""}
               </ThemedText>
@@ -176,9 +240,9 @@ const App = () => {
 
         <View style={styles.progressContainer}>
           <ProgressBar
-            duration={(isExercise ? duration : restDuration) * 1000}
+            duration={(isExercise ? exercise.duration : restDuration) * 1000}
             isPlaying={isPlaying}
-            resetKey={`${exerciseIndex}${isExercise}`}
+            resetKey={`${exercise.index}${isExercise}`}
           />
         </View>
 
@@ -187,9 +251,9 @@ const App = () => {
             onPress={handlePrevious}
             style={[
               styles.controlButton,
-              exerciseIndex === 0 && styles.controlButtonDisabled,
+              exercise.index === 0 && styles.controlButtonDisabled,
             ]}
-            disabled={exerciseIndex === 0}
+            disabled={exercise.index === 0}
           >
             <ThemedIcon name="SkipBack" size={32} />
           </Pressable>
@@ -209,10 +273,10 @@ const App = () => {
             onPress={handleNext}
             style={[
               styles.controlButton,
-              exerciseIndex >= exercises.length - 1 &&
+              exercise.index >= exercises.length - 1 &&
                 styles.controlButtonDisabled,
             ]}
-            disabled={exerciseIndex >= exercises.length - 1}
+            disabled={exercise.index >= exercises.length - 1}
           >
             <ThemedIcon name="SkipForward" size={32} />
           </Pressable>
@@ -277,12 +341,8 @@ const styles = StyleSheet.create({
     borderRadius: 40,
     alignItems: "center",
     justifyContent: "center",
-    elevation: 4,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+    boxShadow: "0 2 4 0 rgba(0, 0, 0, 0.25)",
   },
 });
 
-export default App;
+export default Workout;

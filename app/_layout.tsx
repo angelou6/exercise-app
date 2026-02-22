@@ -1,5 +1,6 @@
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import { ensureSQLiteDirectoryHealth } from "@/utils/sqliteHealth";
 import i18nInit from "@/utils/language/i18nextConfig";
 import {
   DarkTheme,
@@ -12,6 +13,8 @@ import { openDatabaseSync, SQLiteDatabase, SQLiteProvider } from "expo-sqlite";
 import { StatusBar } from "expo-status-bar";
 import * as SystemUI from "expo-system-ui";
 import { Suspense, useEffect } from "react";
+
+ensureSQLiteDirectoryHealth();
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();

@@ -2,7 +2,7 @@ import { useThemeColor } from "@/hooks/use-theme-color";
 import { Modal, ModalProps } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-export type ThemedModalProps = ModalProps & {
+type ThemedModalProps = ModalProps & {
   children?: React.ReactNode;
   lightColor?: string;
   darkColor?: string;

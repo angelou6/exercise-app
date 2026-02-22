@@ -8,7 +8,6 @@ import {
 import { Colors } from "@/constants/theme";
 import { deleteExercise, getAllExercises } from "@/utils/database";
 import { Exercise, SubmitExercise } from "@/utils/databaseTypes";
-import { useFocusEffect } from "expo-router";
 import Fuse from "fuse.js";
 import React, { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -27,7 +26,7 @@ type exerciseSelect = {
   modalVisible: boolean;
   onClose: () => void;
   addExecise: (newEx: Exercise) => void;
-  removeExercise: (exID: number) => void;
+  deleteSelectedExercise: (exID: number) => void;
   selected: SubmitExercise[];
 };
 
@@ -35,13 +34,15 @@ export default function AddExerciseModal({
   modalVisible,
   onClose,
   addExecise,
-  removeExercise,
+  deleteSelectedExercise,
   selected,
 }: exerciseSelect) {
   const { t } = useTranslation();
+  const theme = useColorScheme() ?? "light";
+  const tintColor = theme === "light" ? Colors.light.tint : Colors.dark.tint;
   const defaultIconSize = 22;
 
-  const [exercises, setExercises] = useState<Exercise[]>([]);
+  const [exercises, setExercises] = useState<Exercise[]>(getAllExercises);
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const [editingExercise, setEditingExercise] = useState<Exercise | null>(null);
 
@@ -55,30 +56,13 @@ export default function AddExerciseModal({
     [exercises],
   );
 
-  const theme = useColorScheme() ?? "light";
-  const tintColor = theme === "light" ? Colors.light.tint : Colors.dark.tint;
-
   const selectedIncludes = (newEx: Exercise) => {
     return selected.find((ex) => ex.exercise.id === newEx.id);
   };
 
-  useFocusEffect(
-    useCallback(() => {
-      const rows = getAllExercises();
-      setExercises(rows);
-
-      const currentIDs = new Set(rows.map((r) => r.id));
-      for (const ex of selected) {
-        if (!currentIDs.has(ex.exercise.id)) {
-          removeExercise(ex.exercise.id);
-        }
-      }
-    }, []),
-  );
-
   const handleSelectExercise = (exercise: Exercise) => {
     if (selectedIncludes(exercise)) {
-      removeExercise(exercise.id);
+      deleteSelectedExercise(exercise.id);
     } else {
       addExecise(exercise);
     }
@@ -93,7 +77,7 @@ export default function AddExerciseModal({
       setFuzzyExercises((prev) => prev.filter((e) => e.id !== id));
     }
 
-    removeExercise(id);
+    deleteSelectedExercise(id);
   };
 
   const handleExerciseChange = (newExerciseId: number | undefined | null) => {
@@ -107,6 +91,75 @@ export default function AddExerciseModal({
       }
     }
   };
+
+  const renderItem = useCallback(
+    ({ item }: { item: Exercise }) => {
+      const isSelected = !!selectedIncludes(item);
+      return (
+        <Pressable
+          style={styles.exerciseCard}
+          onPress={() => handleSelectExercise(item)}
+        >
+          <View style={styles.selectionIndicator}>
+            {isSelected ? (
+              <ThemedIcon
+                name="SquareCheck"
+                color={tintColor}
+                size={defaultIconSize}
+              />
+            ) : (
+              <ThemedIcon
+                variant="dimmed"
+                name="Square"
+                color={tintColor}
+                size={defaultIconSize}
+              />
+            )}
+          </View>
+
+          <View style={styles.cardText}>
+            <ThemedText
+              type="defaultSemiBold"
+              style={
+                !isSelected && {
+                  opacity: 0.8,
+                }
+              }
+            >
+              {item.name}
+            </ThemedText>
+            {item.description && item.description.length > 0 && (
+              <ThemedText type="subtitle" style={styles.exerciseDesc}>
+                {item.description}
+              </ThemedText>
+            )}
+          </View>
+          <Pressable
+            onPress={() => {
+              Alert.alert(
+                t("exercise.deleteExerciseTitle"),
+                t("exercise.deleteExerciseConfirm", { name: item.name }),
+                [
+                  { text: t("common.cancel"), style: "cancel" },
+                  {
+                    text: t("common.delete"),
+                    style: "destructive",
+                    onPress: () => {
+                      handleDeleteExercise(item.id);
+                    },
+                  },
+                ],
+              );
+            }}
+            hitSlop={10}
+            style={styles.iconButton}
+          >
+            <ThemedIcon name="Trash2" size={18} />
+          </Pressable>
+        </Pressable>
+      );
+    }, [selectedIncludes, handleSelectExercise, tintColor, t, handleDeleteExercise]
+  )
 
   return (
     <ThemedModal
@@ -152,72 +205,7 @@ export default function AddExerciseModal({
             </View>
           </View>
         }
-        renderItem={({ item }) => {
-          const isSelected = !!selectedIncludes(item);
-          return (
-            <Pressable
-              style={[styles.exerciseCard]}
-              onPress={() => handleSelectExercise(item)}
-            >
-              <View style={styles.selectionIndicator}>
-                {isSelected ? (
-                  <ThemedIcon
-                    name="SquareCheck"
-                    color={tintColor}
-                    size={defaultIconSize}
-                  />
-                ) : (
-                  <ThemedIcon
-                    variant="dimmed"
-                    name="Square"
-                    color={tintColor}
-                    size={defaultIconSize}
-                  />
-                )}
-              </View>
-
-              <View style={styles.cardText}>
-                <ThemedText
-                  type="defaultSemiBold"
-                  style={
-                    !isSelected && {
-                      opacity: 0.8,
-                    }
-                  }
-                >
-                  {item.name}
-                </ThemedText>
-                {item.description && item.description.length > 0 && (
-                  <ThemedText type="subtitle" style={styles.exerciseDesc}>
-                    {item.description}
-                  </ThemedText>
-                )}
-              </View>
-              <Pressable
-                onPress={() => {
-                  Alert.alert(
-                    t("exercise.deleteExerciseTitle"),
-                    t("exercise.deleteExerciseConfirm", { name: item.name }),
-                    [
-                      { text: t("common.cancel"), style: "cancel" },
-                      {
-                        text: t("common.delete"),
-                        style: "destructive",
-                        onPress: () => {
-                          handleDeleteExercise(item.id);
-                        },
-                      },
-                    ],
-                  );
-                }}
-                hitSlop={10}
-                style={styles.iconButton}
-              >
-                <ThemedIcon name="Trash2" size={18} />
-              </Pressable>
-            </Pressable>
-          );
-        }}
+        renderItem={renderItem}
       />
 
       <View style={styles.footer}>

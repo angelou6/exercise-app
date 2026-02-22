@@ -5,17 +5,17 @@ import { ThemedIcon, ThemedText } from "../../themed";
 
 type RadioType = {
   options: string[];
-  defaultIndex: number;
+  initialIndex: number;
   onSelect?: (selected: number) => void;
 };
 
 export default function RadioSelect({
   options,
-  defaultIndex,
+  initialIndex,
   onSelect,
 }: RadioType) {
   const theme = useColorScheme() ?? "light";
-  const [active, setActive] = useState(defaultIndex);
+  const [active, setActive] = useState(initialIndex);
 
   const pressHandle = (index: number) => {
     setActive(index);

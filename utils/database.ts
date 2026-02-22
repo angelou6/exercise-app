@@ -1,10 +1,12 @@
 import { openDatabaseSync, SQLiteDatabase } from "expo-sqlite";
 import { Exercise, SubmitExercise, Workout } from "./databaseTypes";
+import { ensureSQLiteDirectoryHealth } from "./sqliteHealth";
 
 let db: SQLiteDatabase | undefined = undefined;
 
 function getDatabase() {
   if (!db) {
+    ensureSQLiteDirectoryHealth();
     db = openDatabaseSync("exercise.db", { useNewConnection: true });
   }
   return db;
@@ -120,10 +122,10 @@ export function getExercisesFromWorkout(workoutID: number) {
       };
     })
     .filter((ex) => ex !== null) as {
-    exercise: Exercise;
-    order: number;
-    duration: number;
-  }[];
+      exercise: Exercise;
+      order: number;
+      duration: number;
+    }[];
 }
 
 export function createWorkout(

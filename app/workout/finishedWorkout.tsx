@@ -11,7 +11,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 const partyPopperSource = require("../../assets/audio/partypopper.mp3");
 
-const App = () => {
+const FinishedWorkout = () => {
   const { t } = useTranslation();
   const { wID } = useLocalSearchParams();
   const partyPopperAudio = useAudioPlayer(partyPopperSource);
@@ -118,4 +118,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default App;
+export default FinishedWorkout;

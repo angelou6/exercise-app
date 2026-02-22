@@ -10,7 +10,7 @@ import {
 } from "@/utils/database";
 import { Exercise, SubmitExercise } from "@/utils/databaseTypes";
 import { router, useLocalSearchParams } from "expo-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   ListRenderItemInfo,
@@ -26,30 +26,28 @@ import ReorderableList, {
 } from "react-native-reorderable-list";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-const App = () => {
+const CreateWorkout = () => {
   const { t } = useTranslation();
-  const { wID, wEmoji, wName, wRest } = useLocalSearchParams();
   const cardTheme = useCardTheme();
-
+  const { wID, wEmoji, wName, wRest } = useLocalSearchParams();
   const defaultDuration = 30;
   const isEdit = !!wID;
 
   const [modalVisible, setModalVisible] = useState(false);
-  const [exercises, setExercises] = useState<SubmitExercise[]>([]);
-
-  const [emoji, setEmoji] = useState(wEmoji?.toString() || "️💪");
-  const [name, setName] = useState(wName?.toString() || "");
-  const [restTime, setRestTime] = useState(wRest?.toString() || "5");
-
-  useEffect(() => {
+  const [exercises, setExercises] = useState<SubmitExercise[]>(() => {
     if (wID) {
       const loadedExercises = getExercisesFromWorkout(parseInt(wID.toString()));
       const sortedExercises = [...loadedExercises].sort(
         (a, b) => a.order - b.order,
       );
-      setExercises(sortedExercises);
+      return sortedExercises;
     }
-  }, [wID]);
+    return [];
+  });
+
+  const [emoji, setEmoji] = useState(wEmoji?.toString() || "️💪");
+  const [name, setName] = useState(wName?.toString() || "");
+  const [restTime, setRestTime] = useState(wRest?.toString() || "5");
 
   const addExercise = (newEx: Exercise, duration = defaultDuration) => {
     for (const ex of exercises) if (ex.exercise.id === newEx.id) return;
@@ -115,7 +113,7 @@ const App = () => {
         <AddExerciseModal
           modalVisible={modalVisible}
           addExecise={addExercise}
-          removeExercise={deleteExercise}
+          deleteSelectedExercise={deleteExercise}
           onClose={() => setModalVisible(false)}
           selected={exercises}
         />
@@ -243,4 +241,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default App;
+export default CreateWorkout;

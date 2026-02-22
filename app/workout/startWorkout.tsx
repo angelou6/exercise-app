@@ -18,15 +18,18 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-const App = () => {
+const StartWorkout = () => {
   const { t } = useTranslation();
   const { workoutID } = useLocalSearchParams();
   const cardTheme = useCardTheme();
 
-  const [workout, setWorkout] = useState(getOneWorkout(Number(workoutID)));
-  const [exercises, setExercises] = useState(
-    getExercisesFromWorkout(Number(workoutID)),
-  );
+  const [workout, setWorkout] = useState(() => {
+    return getOneWorkout(Number(workoutID));
+  });
+
+  const [exercises, setExercises] = useState(() => {
+    return getExercisesFromWorkout(Number(workoutID));
+  });
 
   useFocusEffect(
     useCallback(() => {
@@ -131,7 +134,7 @@ const App = () => {
                   <ThemedIcon name="Dumbbell" size={16} variant="dimmed" />
                   <ThemedText type="dimmed" style={styles.statText}>
                     {t("workout.exerciseCount", {
-                      count: exercises.length,
+                      count: exercises?.length,
                     })}
                   </ThemedText>
                 </View>
@@ -303,4 +306,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default App;
+export default StartWorkout;

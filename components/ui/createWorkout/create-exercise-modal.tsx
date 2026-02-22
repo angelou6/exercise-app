@@ -11,7 +11,7 @@ import {
   updateExercise,
 } from "@/utils/database";
 import { Exercise } from "@/utils/databaseTypes";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Modal,
@@ -38,20 +38,19 @@ export default function CreateExerciseModal({
   const { t } = useTranslation();
   const backgroundColor = useThemeColor({}, "background");
 
-  const [name, setName] = useState("");
-  const [desc, setDesc] = useState("");
-
-  useEffect(() => {
-    if (visible) {
-      if (initialExercise) {
-        setName(initialExercise.name);
-        setDesc(initialExercise.description || "");
-      } else {
-        setName("");
-        setDesc("");
-      }
+  const [name, setName] = useState(() => {
+    if (visible && initialExercise) {
+      return initialExercise.name;
     }
-  }, [visible, initialExercise]);
+    return "";
+  });
+
+  const [desc, setDesc] = useState(() => {
+    if (visible && initialExercise) {
+      return initialExercise.description;
+    }
+    return "";
+  });
 
   const handleSubmit = () => {
     if (!initialExercise) {
@@ -161,14 +160,7 @@ const styles = StyleSheet.create({
     maxWidth: 500,
     borderRadius: 16,
     padding: 20,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
+    boxShadow: "0 2 4 0 rgba(0, 0, 0, 0.25)",
   },
   header: {
     flexDirection: "row",

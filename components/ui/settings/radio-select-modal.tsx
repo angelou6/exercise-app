@@ -40,10 +40,10 @@ export default function RadioSelectModal({
       <Pressable style={styles.overlay} onPress={onClose}>
         <TouchableWithoutFeedback>
           <View style={[styles.container, { backgroundColor }]}>
-            <View style={styles.content}>
+            <View>
               <RadioSelect
                 options={options}
-                defaultIndex={defaultIndex}
+                initialIndex={defaultIndex}
                 onSelect={handleSelect}
               />
             </View>
@@ -67,22 +67,12 @@ const styles = StyleSheet.create({
     maxWidth: 400,
     borderRadius: 20,
     padding: 20,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    boxShadow: "0 2 4 0 rgba(0, 0, 0, 0.25)",
   },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 10,
-  },
-  content: {
-    //
   },
 });

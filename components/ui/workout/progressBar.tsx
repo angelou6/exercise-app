@@ -1,7 +1,8 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { StyleSheet, View } from "react-native";
 import Animated, {
   cancelAnimation,
+  useAnimatedReaction,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
@@ -20,23 +21,27 @@ export default function ShrinkingProgressBar({
 }: ProgressBar) {
   const progress = useSharedValue(1);
 
-  useEffect(() => {
-    progress.value = 1;
-  }, [resetKey]);
+  useAnimatedReaction(
+    () => {
+      return { duration, isPlaying, resetKey };
+    },
+    (next, prev) => {
+      if (next.resetKey !== prev?.resetKey) {
+        progress.set(1);
+      }
 
-  useEffect(() => {
-    if (!isPlaying) {
-      cancelAnimation(progress);
-    } else {
-      progress.value = withTiming(0, {
-        duration: duration,
-      });
-    }
-  }, [duration, isPlaying, resetKey, progress]);
+      if (!next.isPlaying) {
+        cancelAnimation(progress);
+      } else {
+        progress.set(withTiming(0, { duration: next.duration }));
+      }
+    },
+    [duration, isPlaying, resetKey],
+  );
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
-      width: `${progress.value * 100}%`,
+      width: `${progress.get() * 100}%`,
     };
   });
 

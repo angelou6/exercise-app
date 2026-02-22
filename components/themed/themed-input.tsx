@@ -2,7 +2,7 @@ import { TextInput, TextInputProps } from "react-native";
 
 import { useThemeColor } from "@/hooks/use-theme-color";
 
-export type InputProps = TextInputProps & {
+type InputProps = TextInputProps & {
   lightColor?: string;
   darkColor?: string;
   lightPlaceholderColor?: string;

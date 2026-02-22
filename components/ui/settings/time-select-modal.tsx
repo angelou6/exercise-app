@@ -2,7 +2,6 @@ import { ThemedButton } from "@/components/themed/themed-button";
 import { ThemedInput } from "@/components/themed/themed-input";
 import { ThemedText } from "@/components/themed/themed-text";
 import { useThemeColor } from "@/hooks/use-theme-color";
-import Storage from "expo-sqlite/kv-store";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
@@ -27,26 +26,10 @@ export default function TimeSelectModal({
 }: TimeSelectModalProps) {
   const { t } = useTranslation();
   const backgroundColor = useThemeColor({}, "background");
+  const timeRegex: RegExp = /^(?:[01][0-9]|2[0-3]):[0-5][0-9](?::[0-5][0-9])?$/;
+
   const [hour, setHour] = useState("16");
   const [minute, setMinute] = useState("00");
-  const [disabled, setDisabled] = useState(false);
-
-  useEffect(() => {
-    const timeRegex: RegExp =
-      /^(?:[01][0-9]|2[0-3]):[0-5][0-9](?::[0-5][0-9])?$/;
-    const timeString = `${formatTime(hour)}:${formatTime(minute)}`;
-    const validTime = timeRegex.test(timeString);
-    setDisabled(!validTime);
-  }, [hour, minute]);
-
-  useEffect(() => {
-    const savedTime = Storage.getItemSync("notificationTime");
-    if (savedTime) {
-      const time = JSON.parse(savedTime);
-      setHour(time.hour);
-      setMinute(time.minute);
-    }
-  }, []);
 
   const formatTime = (time: string) => {
     let formatedTime = time;
@@ -56,10 +39,15 @@ export default function TimeSelectModal({
     return formatedTime;
   };
 
+  const timeString = `${formatTime(hour)}:${formatTime(minute)}`;
+  const isDisabled = !timeRegex.test(timeString);
+
   const handleSave = () => {
     onSelect(formatTime(hour), formatTime(minute));
     onClose();
   };
+
+  useEffect(() => {}, []);
 
   return (
     <Modal
@@ -107,10 +95,10 @@ export default function TimeSelectModal({
               </ThemedButton>
               <ThemedButton
                 onPress={handleSave}
-                disabled={disabled}
+                disabled={isDisabled}
                 style={[
                   styles.button,
-                  disabled && {
+                  isDisabled && {
                     opacity: 0.5,
                   },
                 ]}
@@ -136,11 +124,7 @@ const styles = StyleSheet.create({
     width: "80%",
     padding: 20,
     borderRadius: 10,
-    elevation: 5,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+    boxShadow: "0 2 4 0 rgba(0, 0, 0, 0.25)",
   },
   title: {
     textAlign: "center",

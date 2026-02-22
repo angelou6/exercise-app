@@ -1,40 +1,23 @@
-import { useEffect, useState } from "react";
 import { Pressable, StyleSheet } from "react-native";
 import { ThemedIcon, ThemedText } from "../../themed";
 
 type RadioType = {
   text: string;
-  defaultValue?: boolean;
+  isToggled?: boolean;
   onSelect?: (state: boolean) => void;
 };
 
-export default function ToggleButton({
-  text,
-  defaultValue,
-  onSelect,
-}: RadioType) {
-  const [toggle, setToggle] = useState(defaultValue ?? false);
-
-  useEffect(() => {
-    if (defaultValue !== undefined) {
-      setToggle(defaultValue);
-    }
-  }, [defaultValue]);
-
+export default function ToggleButton({ text, isToggled, onSelect }: RadioType) {
   const handlePress = () => {
-    const newState = !toggle;
     if (onSelect) {
-      onSelect(newState);
-    }
-    if (defaultValue === undefined) {
-      setToggle(newState);
+      onSelect(!isToggled);
     }
   };
 
   return (
     <Pressable onPress={handlePress} style={style.radio_option}>
       <ThemedText style={{ flex: 1 }}>{text}</ThemedText>
-      {toggle ? (
+      {isToggled ? (
         <ThemedIcon size={36} name="ToggleRight" />
       ) : (
         <ThemedIcon size={36} name="ToggleLeft" />

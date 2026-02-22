@@ -1,4 +1,4 @@
-import { ThemedIcon, ThemedText } from "@/components/themed";
+import { ThemedIcon, ThemedModal, ThemedText } from "@/components/themed";
 import CountdownModal from "@/components/ui/workout/countdown-modal";
 import ProgressBar from "@/components/ui/workout/progressBar";
 import { useCardTheme } from "@/hooks/use-card-theeme";
@@ -110,6 +110,8 @@ const Workout = () => {
   const [timeLeft, setTimeLeft] = useState(exercise.duration);
   const [isExercise, setIsExercise] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isDescriptionModalVisible, setIsDescriptionModalVisible] =
+    useState(false);
 
   const restDuration = Number(wRest);
 
@@ -179,19 +181,17 @@ const Workout = () => {
       return;
     }
 
-    const interval = setInterval(() => {
-      setTimeLeft((time) => time - 1);
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [isPlaying]);
-
-  useEffect(() => {
     if (timeLeft <= 5 && timeLeft > 0) {
       playaudio(clickAudio);
     } else if (timeLeft <= 0) {
       handleFinished();
     }
-  }, [timeLeft]);
+
+    const interval = setInterval(() => {
+      setTimeLeft((time) => time - 1);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [isPlaying, timeLeft]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -207,6 +207,20 @@ const Workout = () => {
         <Pressable onPress={() => router.back()}>
           <ThemedIcon name="ArrowLeft" size={24} />
         </Pressable>
+        {isExercise && exercise.description ? (
+          <Pressable
+            onPress={() => {
+              setIsPlaying(false);
+              setIsDescriptionModalVisible(true);
+            }}
+            style={styles.headerInfoButton}
+            hitSlop={10}
+          >
+            <ThemedIcon name="Info" size={20} />
+          </Pressable>
+        ) : (
+          <View style={styles.headerInfoPlaceholder} />
+        )}
       </View>
 
       <View style={styles.content}>
@@ -216,14 +230,14 @@ const Workout = () => {
               <ThemedText style={styles.titleText} type="title">
                 {exercise.name}
               </ThemedText>
-              {exercise.description ? (
-                <ThemedText type="dimmed">{exercise.description}</ThemedText>
-              ) : null}
+              <ThemedText type="dimmed" style={styles.hiddenSecondaryText}>
+                {" "}
+              </ThemedText>
             </View>
           ) : (
             <View style={styles.exerciseContainer}>
               <ThemedText type="title">{t("workout.restTime")}</ThemedText>
-              <ThemedText type="dimmed">
+              <ThemedText type="dimmed" style={styles.secondaryText}>
                 {exercise.index + 1 < exercises.length
                   ? t("workout.upNext", {
                       name: exercises[exercise.index + 1].exercise.name,
@@ -282,6 +296,32 @@ const Workout = () => {
           </Pressable>
         </View>
       </View>
+
+      <ThemedModal
+        transparent
+        animationType="fade"
+        visible={isDescriptionModalVisible}
+        presentationStyle="overFullScreen"
+        style={styles.modalOverlay}
+        onRequestClose={() => setIsDescriptionModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View
+            style={[
+              styles.modalContent,
+              { backgroundColor: cardTheme.background },
+            ]}
+          >
+            <View style={styles.modalHeader}>
+              <ThemedText type="subtitle">{exercise.name}</ThemedText>
+              <Pressable onPress={() => setIsDescriptionModalVisible(false)}>
+                <ThemedIcon name="X" size={20} />
+              </Pressable>
+            </View>
+            <ThemedText type="dimmed">{exercise.description}</ThemedText>
+          </View>
+        </View>
+      </ThemedModal>
     </SafeAreaView>
   );
 };
@@ -291,15 +331,40 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingHorizontal: 20,
     paddingVertical: 15,
+  },
+  headerInfoButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  headerInfoPlaceholder: {
+    width: 40,
+    height: 40,
   },
   exerciseContainer: {
     alignItems: "center",
     gap: 10,
+    width: "100%",
+    minHeight: 74,
   },
   titleText: {
     textAlign: "center",
+  },
+  secondaryText: {
+    textAlign: "center",
+    minHeight: 20,
+  },
+  hiddenSecondaryText: {
+    textAlign: "center",
+    minHeight: 20,
+    opacity: 0,
   },
   content: {
     flex: 1,
@@ -342,6 +407,24 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     boxShadow: "0 2 4 0 rgba(0, 0, 0, 0.25)",
+  },
+  modalOverlay: {
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    paddingHorizontal: 24,
+  },
+  modalContent: {
+    borderRadius: 12,
+    padding: 16,
+    gap: 12,
+  },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
 });
 

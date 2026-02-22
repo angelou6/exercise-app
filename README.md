@@ -3,8 +3,11 @@
 This is a very simple exercise app written in React Native
 
 <div align="center">
-  <img width="700" alt="screenshot" src="https://github.com/user-attachments/assets/8dfa8702-f171-44b1-bdd3-cb07586ddad7" />
+  <img width="700" alt="template(1)" src="https://github.com/user-attachments/assets/a07d5fc4-37bc-4fc0-aaf6-0cefd3c2a9fd" />
 </div>
+
+
+
 
 ## Features
 

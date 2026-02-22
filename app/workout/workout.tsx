@@ -3,6 +3,7 @@ import CountdownModal from "@/components/ui/workout/countdown-modal";
 import ProgressBar from "@/components/ui/workout/progressBar";
 import { useCardTheme } from "@/hooks/use-card-theeme";
 import { getExercisesFromWorkout } from "@/utils/database";
+import playaudio from "@/utils/playaudio";
 import { useAudioPlayer } from "expo-audio";
 import { useKeepAwake } from "expo-keep-awake";
 import { router, useLocalSearchParams } from "expo-router";
@@ -11,8 +12,8 @@ import { useTranslation } from "react-i18next";
 import { Pressable, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-const dingAudioSource = require("../../assets/audio/ding.mp3");
-const clickAudioSource = require("../../assets/audio/click.mp3");
+const dingAudioSource = require("@/assets/audio/ding.mp3");
+const clickAudioSource = require("@/assets/audio/click.mp3");
 
 interface ExerciseState {
   index: number;
@@ -56,7 +57,15 @@ const Workout = () => {
         break;
     }
 
-    let newExercise = exercises[state.index + dir];
+    let index = state.index + dir;
+    const isInBounds = index >= 0 && index < exercises.length;
+    if (!isInBounds) {
+      index = 0;
+      console.error(
+        `Exercise index out of bounds. Index: ${index} Array size: ${exercises.length}`,
+      );
+    }
+    let newExercise = exercises[index];
 
     return {
       index: state.index + dir,
@@ -108,8 +117,7 @@ const Workout = () => {
     if (exercise.index + 1 < exercises.length) {
       setIsExercise(false);
       setTimeLeft(restDuration);
-      dingAudio.seekTo(0);
-      dingAudio.play();
+      playaudio(dingAudio);
     } else {
       router.replace({
         pathname: "/workout/finishedWorkout",
@@ -137,8 +145,7 @@ const Workout = () => {
 
   const handleRestFinished = () => {
     changeExercise("next");
-    dingAudio.seekTo(0);
-    dingAudio.play();
+    playaudio(dingAudio);
   };
 
   const handlePrevious = () => {
@@ -174,31 +181,24 @@ const Workout = () => {
 
     const interval = setInterval(() => {
       setTimeLeft((time) => time - 1);
-      if (timeLeft <= 1) {
-        handleFinished();
-      }
     }, 1000);
     return () => clearInterval(interval);
-  }, [isPlaying, timeLeft, isExercise]);
+  }, [isPlaying]);
 
   useEffect(() => {
-    if (!isPlaying) {
-      return;
-    }
-
     if (timeLeft <= 5 && timeLeft > 0) {
-      clickAudio.seekTo(0);
-      clickAudio.play();
+      playaudio(clickAudio);
+    } else if (timeLeft <= 0) {
+      handleFinished();
     }
-  }, [timeLeft, isPlaying]);
+  }, [timeLeft]);
 
   return (
     <SafeAreaView style={styles.container}>
       <CountdownModal
         visible={inCountdown}
-        setVisible={setInCountdown}
         initialDuration={5}
-        onClose={useCallback(() => {
+        onclose={useCallback(() => {
           setInCountdown(false);
           setIsPlaying(true);
         }, [])}

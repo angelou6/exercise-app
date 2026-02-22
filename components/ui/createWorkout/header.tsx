@@ -4,7 +4,7 @@ import {
   ThemedInput,
   ThemedText,
 } from "@/components/themed";
-import { CardTheme } from "@/constants/theme";
+import { useCardTheme } from "@/hooks/use-card-theeme";
 import { validateNumberInput } from "@/utils/input";
 import { router } from "expo-router";
 import React, { useState } from "react";
@@ -14,29 +14,24 @@ import { EmojiType } from "rn-emoji-keyboard";
 
 type Header = {
   name: string;
-  setName: React.Dispatch<React.SetStateAction<string>>;
   emoji: string;
-  setEmoji: React.Dispatch<React.SetStateAction<string>>;
-  restTime: string;
-  setRestTime: React.Dispatch<React.SetStateAction<string>>;
-  cardTheme: CardTheme;
+  rest: number;
+  onchange: (name: string, emoji: string, rest: number) => void;
 };
 
-export default function WorkoutHeader({
-  name,
-  setName,
-  emoji,
-  setEmoji,
-  restTime,
-  setRestTime,
-  cardTheme,
-}: Header) {
+export default function WorkoutHeader({ name, emoji, rest, onchange }: Header) {
   const { t } = useTranslation();
+  const cardTheme = useCardTheme();
   const defaultRestTime = 5;
+
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
+  const handleChange = (name: string, emoji: string, rest: number) => {
+    onchange(name, emoji, rest);
+  };
+
   const handlePick = (emojiObject: EmojiType) => {
-    setEmoji(emojiObject.emoji);
+    handleChange(name, emojiObject.emoji, rest);
   };
 
   return (
@@ -73,7 +68,7 @@ export default function WorkoutHeader({
             value={name}
             multiline
             scrollEnabled={true}
-            onChangeText={setName}
+            onChangeText={(text) => handleChange(text, emoji, rest)}
             style={styles.workoutName}
             placeholder={t("createWorkout.workoutNamePlaceholder")}
           />
@@ -85,10 +80,11 @@ export default function WorkoutHeader({
             <ThemedInput
               keyboardType="numeric"
               placeholder={defaultRestTime.toString()}
-              value={restTime}
+              value={String(rest)}
               maxLength={3}
-              onChangeText={(text) =>
-                validateNumberInput(text) && setRestTime(text)
+              onChangeText={(rest) =>
+                validateNumberInput(rest) &&
+                handleChange(name, emoji, Number(rest))
               }
               style={styles.restInputField}
             />

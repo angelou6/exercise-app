@@ -3,7 +3,6 @@ import { Colors } from "@/constants/theme";
 import { useCardTheme } from "@/hooks/use-card-theeme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { getAllWorkouts } from "@/utils/database";
-import { Workout } from "@/utils/databaseTypes";
 import { getTodayString, getYesterdayString } from "@/utils/streakUtils";
 import { router, useFocusEffect } from "expo-router";
 import { Storage } from "expo-sqlite/kv-store";
@@ -12,66 +11,58 @@ import { useTranslation } from "react-i18next";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+interface Streak {
+  active: boolean;
+  value: number;
+}
+
+function initStreak(): Streak {
+  let streakValue: number = 0;
+  const activeStreak = Storage.getItemSync("useStreak") === "true";
+  if (activeStreak) {
+    const streakNum = Number(Storage.getItemSync("streak")) || 0;
+    const lastDayExercised = Storage.getItemSync("lastDayExercised");
+    if (!lastDayExercised) {
+      if (streakNum > 0) Storage.setItemSync("streak", "0");
+      streakValue = 0;
+    } else {
+      const todayStr = getTodayString();
+      const yesterdayStr = getYesterdayString();
+      if (lastDayExercised === todayStr || lastDayExercised === yesterdayStr) {
+        streakValue = streakNum;
+      } else {
+        streakValue = 0;
+        Storage.setItemSync("streak", "0");
+      }
+    }
+  }
+  return { active: activeStreak, value: streakValue };
+}
+
 const App = () => {
   const { t } = useTranslation();
   const theme = useColorScheme() ?? "light";
 
   const cardTheme = useCardTheme();
 
-  const [workouts, setWorkouts] = useState<Workout[]>([]);
-  const [useStreak, setUseStreak] = useState(false);
-  const [streak, setStreak] = useState(0);
+  const workouts = getAllWorkouts();
+  const [streak, setStreak] = useState(initStreak);
 
   useFocusEffect(
     useCallback(() => {
-      const activeStreak = Storage.getItemSync("useStreak") === "true";
-      setUseStreak(activeStreak);
-
-      if (activeStreak) {
-        const streakNum = Number(Storage.getItemSync("streak")) || 0;
-        const lastDayExercised = Storage.getItemSync("lastDayExercised");
-
-        if (!lastDayExercised) {
-          setStreak(0);
-          if (streakNum > 0) Storage.setItemSync("streak", "0");
-          return;
-        }
-
-        const todayStr = getTodayString();
-        const yesterdayStr = getYesterdayString();
-
-        if (
-          lastDayExercised === todayStr ||
-          lastDayExercised === yesterdayStr
-        ) {
-          setStreak(streakNum);
-        } else {
-          setStreak(0);
-          Storage.setItemSync("streak", "0");
-        }
-      }
-    }, []),
-  );
-
-  useFocusEffect(
-    useCallback(() => {
-      try {
-        setWorkouts(getAllWorkouts());
-      } catch {
-        setWorkouts([]);
-      }
+      setStreak(initStreak);
     }, []),
   );
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        {useStreak && (
+        {streak.active && (
           <View style={styles.streakContainer}>
             <ThemedIcon
               name="Flame"
               color={
-                streak > 0
+                streak.value > 0
                   ? "red"
                   : theme === "light"
                     ? Colors.light.icon
@@ -79,7 +70,7 @@ const App = () => {
               }
               size={24}
             />
-            <ThemedText type="defaultSemiBold">{streak}</ThemedText>
+            <ThemedText type="defaultSemiBold">{streak.value}</ThemedText>
           </View>
         )}
         <Pressable onPress={() => router.push("/settings")}>

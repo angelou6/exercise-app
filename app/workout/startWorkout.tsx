@@ -76,9 +76,6 @@ const StartWorkout = () => {
       pathname: "/workout/createWorkout",
       params: {
         wID: workoutID,
-        wEmoji: workout.emoji,
-        wName: workout.name,
-        wRest: workout.rest,
       },
     });
   };

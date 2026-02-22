@@ -6,11 +6,12 @@ import { useCardTheme } from "@/hooks/use-card-theeme";
 import {
   createWorkout,
   getExercisesFromWorkout,
+  getOneWorkout,
   updateWorkout,
 } from "@/utils/database";
 import { Exercise, SubmitExercise } from "@/utils/databaseTypes";
 import { router, useLocalSearchParams } from "expo-router";
-import { useState } from "react";
+import { useReducer, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   ListRenderItemInfo,
@@ -26,12 +27,61 @@ import ReorderableList, {
 } from "react-native-reorderable-list";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+interface Header {
+  emoji: string;
+  name: string;
+  rest: number;
+}
+
+interface HeaderAction {
+  type: "setEmoji" | "setName" | "setRest";
+  value: string | number;
+}
+
+function headerDispacher(state: Header, action: HeaderAction) {
+  const { type, value } = action;
+
+  switch (type) {
+    case "setEmoji":
+      return { ...state, emoji: value as string };
+    case "setName":
+      return { ...state, name: value as string };
+    case "setRest":
+      return { ...state, rest: value as number };
+    default:
+      return state;
+  }
+}
+
 const CreateWorkout = () => {
   const { t } = useTranslation();
   const cardTheme = useCardTheme();
-  const { wID, wEmoji, wName, wRest } = useLocalSearchParams();
+  const { wID } = useLocalSearchParams();
   const defaultDuration = 30;
   const isEdit = !!wID;
+
+  const [header, headerDispatch] = useReducer(
+    headerDispacher,
+    {
+      emoji: "️💪",
+      name: "",
+      rest: 5,
+    },
+    (state: Header) => {
+      if (isEdit) {
+        const workout = getOneWorkout(Number(wID));
+        if (workout) {
+          return {
+            emoji: workout.emoji,
+            name: workout.name,
+            rest: workout.rest,
+          };
+        }
+        return state;
+      }
+      return state;
+    },
+  );
 
   const [modalVisible, setModalVisible] = useState(false);
   const [exercises, setExercises] = useState<SubmitExercise[]>(() => {
@@ -45,9 +95,12 @@ const CreateWorkout = () => {
     return [];
   });
 
-  const [emoji, setEmoji] = useState(wEmoji?.toString() || "️💪");
-  const [name, setName] = useState(wName?.toString() || "");
-  const [restTime, setRestTime] = useState(wRest?.toString() || "5");
+  const handleHeaderChange = (name: string, emoji: string, rest: number) => {
+    if (name !== header.name) headerDispatch({ type: "setName", value: name });
+    if (emoji !== header.emoji)
+      headerDispatch({ type: "setEmoji", value: emoji });
+    if (rest !== header.rest) headerDispatch({ type: "setRest", value: rest });
+  };
 
   const addExercise = (newEx: Exercise, duration = defaultDuration) => {
     for (const ex of exercises) if (ex.exercise.id === newEx.id) return;
@@ -64,18 +117,18 @@ const CreateWorkout = () => {
   };
 
   const handleCreateWorkout = () => {
-    if (!name.trim()) return;
-    createWorkout(emoji, name, parseInt(restTime), exercises);
+    if (!header.name.trim()) return;
+    createWorkout(header.emoji, header.name, Number(header.rest), exercises);
     router.push("/");
   };
 
   const handleUpdateWorkout = () => {
-    if (!name.trim()) return;
+    if (!header.name.trim()) return;
     updateWorkout(
-      Number(String(wID)),
-      emoji,
-      name,
-      Number(restTime),
+      Number(wID),
+      header.emoji,
+      header.name,
+      Number(header.rest),
       exercises,
     );
     router.back();
@@ -126,13 +179,10 @@ const CreateWorkout = () => {
             keyExtractor={(item) => item.exercise.id.toString()}
             ListHeaderComponent={
               <WorkoutHeader
-                name={name}
-                setName={setName}
-                emoji={emoji}
-                setEmoji={setEmoji}
-                restTime={restTime}
-                setRestTime={setRestTime}
-                cardTheme={cardTheme}
+                name={header.name}
+                emoji={header.emoji}
+                rest={header.rest}
+                onchange={handleHeaderChange}
               />
             }
             ListEmptyComponent={
@@ -174,9 +224,11 @@ const CreateWorkout = () => {
               onPress={() => handleUpdateWorkout()}
               style={[
                 styles.saveButton,
-                (!name.trim() || exercises.length === 0) && { opacity: 0.5 },
+                (!header.name.trim() || exercises.length === 0) && {
+                  opacity: 0.5,
+                },
               ]}
-              disabled={!name.trim() || exercises.length === 0}
+              disabled={!header.name.trim() || exercises.length === 0}
             >
               <ThemedIcon name="Save" size={20} />
               <Text style={styles.saveButtonText}>
@@ -188,9 +240,11 @@ const CreateWorkout = () => {
               onPress={() => handleCreateWorkout()}
               style={[
                 styles.saveButton,
-                (!name.trim() || exercises.length === 0) && { opacity: 0.5 },
+                (!header.name.trim() || exercises.length === 0) && {
+                  opacity: 0.5,
+                },
               ]}
-              disabled={!name.trim() || exercises.length === 0}
+              disabled={!header.name.trim() || exercises.length === 0}
             >
               <ThemedIcon name="Check" size={20} />
               <Text style={styles.saveButtonText}>

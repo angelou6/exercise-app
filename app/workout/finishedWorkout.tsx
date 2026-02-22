@@ -4,19 +4,19 @@ import { getTodayString, getYesterdayString } from "@/utils/streakUtils";
 import { useAudioPlayer } from "expo-audio";
 import { router, useLocalSearchParams } from "expo-router";
 import { Storage } from "expo-sqlite/kv-store";
-import { useEffect, useMemo } from "react";
+import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-const partyPopperSource = require("../../assets/audio/partypopper.mp3");
+const partyPopperSource = require("@/assets/audio/partypopper.mp3");
 
 const FinishedWorkout = () => {
   const { t } = useTranslation();
   const { wID } = useLocalSearchParams();
   const partyPopperAudio = useAudioPlayer(partyPopperSource);
 
-  const workout = useMemo(() => getOneWorkout(Number(wID)), [wID]);
+  const workout = getOneWorkout(Number(wID));
 
   const handleGoHome = () => {
     router.replace("/");

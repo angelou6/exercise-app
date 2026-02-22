@@ -1,4 +1,5 @@
 import { ThemedModal } from "@/components/themed/themed-modal";
+import playaudio from "@/utils/playaudio";
 import { useAudioPlayer } from "expo-audio";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
@@ -7,43 +8,42 @@ import { StyleSheet, Text, View } from "react-native";
 type CountdownModalProps = {
   visible: boolean;
   initialDuration: number;
-  setVisible: React.Dispatch<React.SetStateAction<boolean>>;
-  onClose: () => void;
+  onclose: () => void;
 };
 
-const clickAudioSource = require("../../../assets/audio/click.mp3");
-const dingAudioSource = require("../../../assets/audio/ding.mp3");
+const clickAudioSource = require("@/assets/audio/click.mp3");
+const dingAudioSource = require("@/assets/audio/ding.mp3");
 
 export default function CountdownModal({
   visible,
   initialDuration,
-  onClose,
+  onclose,
 }: CountdownModalProps) {
   const clickAudio = useAudioPlayer(clickAudioSource);
   const dingAudio = useAudioPlayer(dingAudioSource);
-  let [timeLeft, setTimeLeft] = useState(initialDuration);
+  const [timeLeft, setTimeLeft] = useState(initialDuration);
 
   useEffect(() => {
-    if (timeLeft <= 0) {
-      dingAudio.seekTo(0);
-      dingAudio.play();
-      onClose();
-      return;
+    if (visible) {
+      setTimeLeft(initialDuration);
     }
+  }, [visible]);
 
-    let timeout = setTimeout(() => {
+  useEffect(() => {
+    const timeout = setTimeout(() => {
       setTimeLeft((t) => t - 1);
     }, 1000);
 
-    return () => clearTimeout(timeout);
-  }, [timeLeft, visible, dingAudio, onClose]);
-
-  useEffect(() => {
-    if (visible && timeLeft <= 5 && timeLeft > 0) {
-      clickAudio.seekTo(0);
-      clickAudio.play();
+    if (timeLeft <= 5 && timeLeft > 0) {
+      playaudio(clickAudio);
     }
-  }, [timeLeft, clickAudio, visible]);
+
+    if (timeLeft <= 0) {
+      clearInterval(timeout);
+      playaudio(dingAudio);
+      onclose();
+    }
+  }, [timeLeft]);
 
   return (
     <ThemedModal

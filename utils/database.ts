@@ -69,7 +69,12 @@ export function deleteExercise(id: number) {
 
 export function getAllWorkouts(): Workout[] {
   const db = getDatabase();
-  return db.getAllSync("SELECT * FROM workouts");
+  try {
+    return db.getAllSync("SELECT * FROM workouts");
+  } catch (error) {
+    console.warn("Error fetching all workouts: ", error);
+    return [];
+  }
 }
 
 export function getSomeWorkouts(ids: number[]): Workout[] {
@@ -122,10 +127,10 @@ export function getExercisesFromWorkout(workoutID: number) {
       };
     })
     .filter((ex) => ex !== null) as {
-      exercise: Exercise;
-      order: number;
-      duration: number;
-    }[];
+    exercise: Exercise;
+    order: number;
+    duration: number;
+  }[];
 }
 
 export function createWorkout(
